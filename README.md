@@ -1,7 +1,7 @@
-# Banker [![CI Build Status](https://secure.travis-ci.org/kylewelsby/banker.png?branch=master)][travis] [![Dependency Status](https://gemnasium.com/kylewelsby/banker.png?travis)][gemnasium]
+# Banker [![CI Build Status](https://secure.travis-ci.org/kylewelsby/Banker.png?branch=master)][travis] [![Dependency Status](https://gemnasium.com/kylewelsby/Banker.png?travis)][gemnasium]
 
-[travis]:http://travis-ci.org/kylewelsby/banker
-[gemnasium]:https://gemnasium.com/kylewelsby/banker
+[travis]:http://travis-ci.org/kylewelsby/Banker
+[gemnasium]:https://gemnasium.com/kylewelsby/Banker
 
 ## Getting Started
 
