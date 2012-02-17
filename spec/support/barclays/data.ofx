@@ -1,0 +1,86 @@
+OFXHEADER:100
+DATA:OFXSGML
+VERSION:102
+SECURITY:NONE
+ENCODING:USASCII
+CHARSET:1252
+COMPRESSION:NONE
+OLDFILEUID:NONE
+NEWFILEUID:NONE
+
+<OFX>
+  <SIGNONMSGSRSV1>
+    <SONRS>
+      <STATUS>
+        <CODE>0
+        <SEVERITY>INFO
+      </STATUS>
+      <DTSERVER>20120217000647[-5:EST]
+      <LANGUAGE>ENG
+    </SONRS>
+  </SIGNONMSGSRSV1>
+  <BANKMSGSRSV1>
+    
+    <STMTTRNRS>
+      <TRNUID>1
+      <STATUS>
+        <CODE>0
+        <SEVERITY>INFO
+      </STATUS>
+      <STMTRS>
+        <CURDEF>GBP
+        <BANKACCTFROM>
+          <BANKID>492900
+          <ACCTID>11111111111111
+          <ACCTTYPE>CHECKING
+        </BANKACCTFROM>
+        <BANKTRANLIST>
+          <DTSTART>20120128000647[-5:EST]
+          <DTEND>20120217000647[-5:EST]
+          
+          <STMTTRN>
+            <TRNTYPE>CASH
+            <DTPOSTED>20120216000000[-5:EST]
+            <TRNAMT>-10.00
+            <FITID>+201202160000001
+            
+            <NAME>TESCO TESCO E  15FEB 20:
+          </STMTTRN>
+          
+          <STMTTRN>
+            <TRNTYPE>PAYMENT
+            <DTPOSTED>20120215000000[-5:EST]
+            <TRNAMT>-156.02
+            <FITID>+201202150000003
+            
+            <NAME>MANCHESTER CC INTE 
+          </STMTTRN>
+          
+          <STMTTRN>
+            <TRNTYPE>DIRECTDEBIT
+            <DTPOSTED>20120215000000[-5:EST]
+            <TRNAMT>-12.12
+            <FITID>+201202150000002
+            
+            <NAME>TV LICENCE MBP  DDR
+          </STMTTRN>
+          
+          <STMTTRN>
+            <TRNTYPE>DIRECTDEBIT
+            <DTPOSTED>20120215000000[-5:EST]
+            <TRNAMT>-60.67
+            <FITID>+201202150000001
+            
+            <NAME>SKY DIGITAL  DDR
+          </STMTTRN>
+          
+        </BANKTRANLIST>
+        <LEDGERBAL>
+          <BALAMT>4100.10
+          <DTASOF>20120216000000[-5:EST]
+        </LEDGERBAL>
+      </STMTRS>
+    </STMTTRNRS>
+    
+  </BANKMSGSRSV1>
+</OFX>
