@@ -45,7 +45,7 @@ describe Banker::Stratagies::Barclays do
     end
     it 'should receive account balance' do
       
-      subject.get_data.account.balance.amount.should eql -1148.91
+      subject.get_data.account.balance.amount.should eql 4100.1
     end
   end
 end

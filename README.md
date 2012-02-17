@@ -21,3 +21,6 @@ Get the balance of the account.
     barclays.get_balance #=> <Money cents: 400000, currency: "GBP">
 
 
+== License
+
+This library is distributed under the MIT license.  Please see the [LICENSE](https://github.com/kylewelsby/Banker/LICENSE.md) file.
