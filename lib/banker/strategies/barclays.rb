@@ -22,7 +22,7 @@ module Banker
     #     data.balance.amount #=> 4100.10
     class Barclays
       attr_accessor :surname, :date_of_birth, :memorable_word,
-        :card_number, :agent, :ofx
+        :card_number, :agent, :ofx, :balance
       LOGIN_ENDPOINT = 'https://ibank.barclays.co.uk/olb/y/BasicAccessStart.do'
       EXPORT_ENDPOINT = 'https://ibank.barclays.co.uk/olb/y/Redirect.do?go=ExportData1.do%3Faction%3DExport%2BBank%2BStatement%7C%7CExport%2BData&Go=Go'
 
@@ -36,8 +36,32 @@ module Banker
         @agent.log = Logger.new "mech.log"
         @agent.user_agent = 'Mozilla/5.0 (Banker)'
 
-        authenticate unless @ofx
+        authenticate
+
+        get_data
+
+        @balance = @ofx.account.balance.amount_in_pennies
       end
+
+      private
+
+      def get_data
+        page = @agent.get EXPORT_ENDPOINT
+
+        form = page.forms_with(:action => "ExportData1.do")[0]
+
+        form.FProductIdentifier = "All"
+        form.FFormat = "6"
+
+        page = @agent.submit(form, form.buttons.first)
+
+        form = page.forms[1]
+
+        file = @agent.submit(form, form.buttons.first)
+
+        @ofx = OFX(file.body)
+      end
+
 
       def authenticate
         page = @agent.get(LOGIN_ENDPOINT)
@@ -70,24 +94,7 @@ module Banker
 
       end
 
-      def get_data
-        page = @agent.get EXPORT_ENDPOINT
 
-        form = page.forms_with(:action => "ExportData1.do")[0]
-
-        form.FProductIdentifier = "All"
-        form.FFormat = "6"
-
-        page = @agent.submit(form, form.buttons.first)
-
-        form = page.forms[1]
-
-        file = @agent.submit(form, form.buttons.first)
-
-        @ofx = OFX(file.body)
-      end
-
-      private
       def card_number_set(set=0)
         set = set * 4
         @card_number.to_s.split(//).map{|a|a.to_i}.slice(set,4).join.to_i

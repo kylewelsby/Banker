@@ -9,11 +9,19 @@ describe Banker::Stratagies::Barclays do
   let(:data) { File.read(File.expand_path('../../../support/barclays/data.ofx',__FILE__)) }
 
   before do
-    stub_http_request(:get, "https://ibank.barclays.co.uk/olb/y/BasicAccessStart.do").to_return(:status => 200, :body => basic_access_start, :headers => {'Content-Type' => 'text/html'})
+    stub_request(:get, "https://ibank.barclays.co.uk/olb/y/BasicAccessStart.do").to_return(:status => 200, :body => basic_access_start, :headers => {'Content-Type' => 'text/html'})
 
-    stub_http_request(:post, "https://ibank.barclays.co.uk/olb/y/BasicAccessStep1.do").to_return(:status => 200, :body => basic_access_step1, :headers => {'Content-Type' => 'text/html'})
+    stub_request(:post, "https://ibank.barclays.co.uk/olb/y/BasicAccessStep1.do").to_return(:status => 200, :body => basic_access_step1, :headers => {'Content-Type' => 'text/html'})
 
-    stub_http_request(:post, "https://ibank.barclays.co.uk/olb/y/BasicAccessStep2.do").to_return(:status => 200, :body => basic_access_step2, :headers => {'Content-Type' => 'text/html'})
+    stub_request(:post, "https://ibank.barclays.co.uk/olb/y/BasicAccessStep2.do").to_return(:status => 200, :body => basic_access_step2, :headers => {'Content-Type' => 'text/html'})
+
+
+    stub_request(:get, "https://ibank.barclays.co.uk/olb/y/Redirect.do?go=ExportData1.do%3Faction%3DExport%2BBank%2BStatement%7C%7CExport%2BData&Go=Go").to_return(:status => 200, :body => redirect, :headers => {'Content-Type' => 'text/html'})
+
+    stub_request(:post, 'https://ibank.barclays.co.uk/olb/y/ExportData1.do').to_return(:status => 200, :body => export_data1, :headers => {'Content-Type' => 'text/html'})
+
+    stub_request(:post, 'https://ibank.barclays.co.uk/olb/y/ExportData5.do').to_return(:status => 200, :body => data, :headers => {'Content-Type' => 'text/html'})
+
   end
 
   subject {Banker::Stratagies::Barclays.new(:surname => 'Bloggs',
@@ -30,29 +38,19 @@ describe Banker::Stratagies::Barclays do
     it{ subject.memorable_word.should eql "superduper" }
 
     it{ subject.card_number.should eql 4111111111111111 }
-  end
 
-  describe '.new' do
+    it{ subject.balance.should eql 410010 }
+
     it "should authenticate account" do
       subject
 
       WebMock.should have_requested(:get, 'https://ibank.barclays.co.uk/olb/y/BasicAccessStart.do')
       WebMock.should have_requested(:post, 'https://ibank.barclays.co.uk/olb/y/BasicAccessStep1.do')
       WebMock.should have_requested(:post, 'https://ibank.barclays.co.uk/olb/y/BasicAccessStep2.do')
-    end
-  end
 
-  describe '#get_data' do
-    before do
-      stub_request(:get, "https://ibank.barclays.co.uk/olb/y/Redirect.do?go=ExportData1.do%3Faction%3DExport%2BBank%2BStatement%7C%7CExport%2BData&Go=Go").to_return(:status => 200, :body => redirect, :headers => {'Content-Type' => 'text/html'})
-
-      stub_request(:post, 'https://ibank.barclays.co.uk/olb/y/ExportData1.do').to_return(:status => 200, :body => export_data1, :headers => {'Content-Type' => 'text/html'})
-
-      stub_request(:post, 'https://ibank.barclays.co.uk/olb/y/ExportData5.do').to_return(:status => 200, :body => data, :headers => {'Content-Type' => 'text/html'})
-    end
-    it 'should receive account balance' do
-
-      subject.get_data.account.balance.amount.should eql 4100.1
+      WebMock.should have_requested(:get, 'https://ibank.barclays.co.uk/olb/y/Redirect.do?go=ExportData1.do%3Faction%3DExport%2BBank%2BStatement%7C%7CExport%2BData&Go=Go')
+      WebMock.should have_requested(:post, 'https://ibank.barclays.co.uk/olb/y/ExportData1.do')
+      WebMock.should have_requested(:post, 'https://ibank.barclays.co.uk/olb/y/ExportData5.do')
     end
   end
 end

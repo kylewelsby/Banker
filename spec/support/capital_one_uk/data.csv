@@ -1,0 +1,4 @@
+Transaction Date, Posting Date, Billing Amount, Merchant, Merchant Town , Merchant County , Merchant Postcode , Reference Number , Debit/Credit Flag , SICMCC Code
+12/02/2012,12/02/2012,-£667.97,PAYMENT RECEIVED -- THANK,YOU,,, "00000000000",C,0000
+05/02/2012,06/02/2012,£0.35,Amazon Web Services,aws.amazon.co,WA,98144, "24692162036000258761559",D,7399
+

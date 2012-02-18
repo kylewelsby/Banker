@@ -13,6 +13,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'mechanize'
   s.add_runtime_dependency 'ofx'
+  s.add_runtime_dependency 'fastercsv'
 
   s.add_development_dependency 'growl'
   s.add_development_dependency 'guard'
