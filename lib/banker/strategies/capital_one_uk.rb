@@ -3,6 +3,7 @@ require 'rubygems'
 require 'mechanize'
 require 'logger'
 require 'csv'
+require 'fastercsv'
 
 module Banker
   module Stratagies
@@ -57,10 +58,14 @@ private
 
         form.downloadType = 'csv'
 
-        csv = @agent.submit(form, form.buttons.first)
-        begin
-          @transactions = CSV.parse(csv.body.gsub(/,\s*/, ','), :headers => true, :col_sep => ',')
-        rescue CSV::IllegalFormatError => e
+        csv_data = @agent.submit(form, form.buttons.first)
+
+        csv = csv_data.body.gsub(/,\s*/, ',')
+
+        if RUBY_VERSION.to_f > 1.8
+          @transactions = CSV.parse(csv, :headers => true)
+        else
+          @transactions = FasterCSV.parse(csv, :headers => true)
         end
       end
 

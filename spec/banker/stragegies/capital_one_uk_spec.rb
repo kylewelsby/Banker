@@ -10,10 +10,16 @@ describe Banker::Stratagies::CapitalOneUK do
     stub_request(:get, "https://www.capitaloneonline.co.uk/CapitalOne_Consumer/Login.do").to_return(:status => 200, :body => login, :headers => {'Content-Type' => 'text/html'})
     stub_request(:post, "https://www.capitaloneonline.co.uk/CapitalOne_Consumer/ProcessLogin.do").to_return(:status => 200, :body => transactions, :headers => {'Content-Type' => 'text/html'})
     stub_request(:post, "https://www.capitaloneonline.co.uk/CapitalOne_Consumer/DownLoadTransaction.do").to_return(:status => 200, :body => data, :headers => {'Content-Type' => 'text/csv; charset=utf-8'})
+
+    @ruby_version = RUBY_VERSION
   end
-  
+
+  after do
+    RUBY_VERSION = @ruby_version
+  end
+
   subject { Banker::Stratagies::CapitalOneUK.new(:username => 'Joe',
-                                                :password => 'password') }
+                                                 :password => 'password') }
 
   describe '.new' do
     it { subject.username.should eql "Joe" }
@@ -32,9 +38,23 @@ describe Banker::Stratagies::CapitalOneUK do
       WebMock.should have_requested(:post, 'https://www.capitaloneonline.co.uk/CapitalOne_Consumer/DownLoadTransaction.do')
     end
 
-    it "should return transactions" do
-      subject.transactions.should be_a(CSV::Table)
-      subject.transactions.first['Billing Amount'].should include "667.97"
+    if RUBY_VERSION.to_f < 1.9
+      context "RubyVersion 1.8.7" do
+        it "should return transactions" do
+          subject.transactions.should be_a(FasterCSV::Table)
+          subject.transactions.first['Billing Amount'].should include "667.97"
+        end
+      end
     end
+
+    if RUBY_VERSION.to_f > 1.8
+      context "RubyVersion 1.8.7" do
+        it "should return transactions" do
+          subject.transactions.should be_a(CSV::Table)
+          subject.transactions.first['Billing Amount'].should include "667.97"
+        end
+      end
+    end
+
   end
 end
