@@ -5,3 +5,4 @@ pkg/*
 kyle.rb
 coverage
 *.un~
+*.log

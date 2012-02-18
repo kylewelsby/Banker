@@ -6,28 +6,28 @@
 ## Supported Institutes
 
 * Barclay's Bank
+* Lloyds TSB UK
 * Capital One UK
 
-## Getting Started
+## Example Usage
 
-Initiate a bank instance.
+	user_params = {
+		surname: "Bloggs",
+		username: "Bloggs123",
+		password: "password",
+		memorable_word: "superduper",
+		card_number: 4111111111111111,
+		date_of_birth: Date.parse('2012-01-01')
+	}
 
-    barclays = Banker::Stratagies::Barclays.new(surname: "Bloggs",
-                         			card_number: 4111111111111111,
-                         			date_of_birth: Date.parse('2012-01-01'),
-                         			memorable_word: "superduper"
-    )
+    # Barclays Bank
+	Banker::Stratagies::Barclays.new(user_params).balance #=> 410000
 
-    capital_one = Banker::Stratagies::CapitalOneUK.new(username: "Bloggs",
-                         			password: "password"
-    )
+	# Lloyds TSB UK
+    Banker::Stratagies::LloydsTSBUK.new(user_params).balance #=> 22049
 
-
-Get the balance of the account.
-
-    barclays.balance #=>410000
-
-    capital_one.balance #=> 0
+	# Capital One UK
+    Banker::Stratagies::CapitalOneUK.new(user_params).balance #=> 0
 
 ## Alternate Languages
 
