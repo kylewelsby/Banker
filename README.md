@@ -29,6 +29,9 @@ Get the balance of the account.
 
     capital_one.balance #=> 0
 
+## Alternate Languages
+
+* Python [Bank Scraper](https://github.com/MoneyToolkit/Bank-Scraper) from MoneyToolKit
 
 ## License
 

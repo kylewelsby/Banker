@@ -58,8 +58,10 @@ private
         form.downloadType = 'csv'
 
         csv = @agent.submit(form, form.buttons.first)
-
-        @transactions = CSV.parse(csv.body.gsub(/,\s*/, ','), :headers => true, :col_sep => ',', :encoding => 'u')
+        begin
+          @transactions = CSV.parse(csv.body.gsub(/,\s*/, ','), :headers => true, :col_sep => ',')
+        rescue CSV::IllegalFormatError => e
+        end
       end
 
     end
