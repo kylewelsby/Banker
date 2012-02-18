@@ -20,12 +20,11 @@ module Banker
     #     data = bank.get_data
     #
     #     data.balance.amount #=> 4100.10
-
     class CapitalOneUK
       attr_accessor :username, :password, :agent, :csv, :balance, :limit, :transactions
 
       LOGIN_ENDPOINT = "https://www.capitaloneonline.co.uk/CapitalOne_Consumer/Login.do"
-      
+
       def initialize(args)
         @username = args[:username]
         @password = args[:password]
@@ -50,7 +49,7 @@ private
         form.password = @password
 
         page = @agent.submit(form, form.buttons.first)
-        
+
         @limit = page.at("table[summary='account summary'] tr:nth-child(1) td.normalText:nth-child(2)").content.gsub(/\D/,'').to_i
         @balance = -page.at("table[summary='account summary'] tr:nth-child(2) td.normalText:nth-child(2)").content.gsub(/\D/,'').to_i
 

@@ -11,11 +11,6 @@ describe Banker::Stratagies::CapitalOneUK do
     stub_request(:post, "https://www.capitaloneonline.co.uk/CapitalOne_Consumer/ProcessLogin.do").to_return(:status => 200, :body => transactions, :headers => {'Content-Type' => 'text/html'})
     stub_request(:post, "https://www.capitaloneonline.co.uk/CapitalOne_Consumer/DownLoadTransaction.do").to_return(:status => 200, :body => data, :headers => {'Content-Type' => 'text/csv; charset=utf-8'})
 
-    @ruby_version = RUBY_VERSION
-  end
-
-  after do
-    RUBY_VERSION = @ruby_version
   end
 
   subject { Banker::Stratagies::CapitalOneUK.new(:username => 'Joe',
