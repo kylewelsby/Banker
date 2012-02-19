@@ -1,7 +1,3 @@
-require 'rubygems'
-require 'mechanize'
-require 'logger'
-
 module Banker
   module Strategies
 

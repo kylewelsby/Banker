@@ -1,10 +1,3 @@
-# -*- encoding: utf-8 -*-
-require 'rubygems'
-require 'mechanize'
-require 'logger'
-require 'csv'
-require 'fastercsv'
-
 module Banker
   module Stratagies
 

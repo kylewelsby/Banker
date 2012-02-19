@@ -29,6 +29,7 @@ describe Banker::Stratagies::LloydsTSBUK do
   describe '.new' do
     it { subject.username.should eql 'Joe' }
     it { subject.password.should eql 'password' }
+    it { subject.balance.should eql 0 }
 
     it "should authenticate account login" do
       subject
