@@ -34,7 +34,6 @@ module Banker
         @agent.user_agent = 'Mozilla/5.0 (Banker)'
         @agent.force_default_encoding = 'utf8'
 
-
         authenticate
       end
 

@@ -9,7 +9,7 @@ describe Banker::Strategies::BarclaycardUK do
   let(:data) {File.read(File.expand_path('data.ofx',support_files))}
 
   subject { Banker::Strategies::BarclaycardUK.new(:username => 'Bloggs',
-                                                 :passcode => '123456',
+                                                 :password => '123456',
                                                  :memorable_word => 'superduper')}
 
   before do

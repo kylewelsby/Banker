@@ -8,35 +8,34 @@
 * Barclay's Bank
 * Barclaycard UK
 * Capital One UK
+* Lloyds TSB UK
 
-## Getting Started
-
-Initiate a bank instance.
-
-    barclays = Banker::Strategies::Barclays.new(surname: "Bloggs",
-                         			card_number: 4111111111111111,
-                         			date_of_birth: Date.parse('2012-01-01'),
-                         			memorable_word: "superduper"
-    )
-
-    capital_one = Banker::Strategies::CapitalOneUK.new(username: "Bloggs",
-                         			password: "password"
-    )
-
-    barclaycard_uk = Banker::Strategies::BarclaycardUK.new(username: "Joe",
-                         			passcode: "123456",
-                              memorable_word: "superduper"
-    )
+## Example Usage
 
 
+
+	user_params = {
+		surname: "Bloggs",
+		username: "Bloggs123",
+		password: "password",
+		memorable_word: "superduper",
+		card_number: 4111111111111111,
+		date_of_birth: Date.parse('2012-01-01')
+	}
 
 Get the balance in pennies of the account.
 
-    barclays.balance #=> 410000
+    # Barclays Bank
+	Banker::Stratagies::Barclays.new(user_params).balance #=> 410000
 
-    capital_one.balance #=> 410000
+    # Barclaycard UK
+    Banker::Strategies::BarclaycardUK.new(user_params).balance #=> 12300
 
-    barclaycard_uk.balance #=> 410000
+	# Lloyds TSB UK
+    Banker::Stratagies::LloydsTSBUK.new(user_params).balance #=> 22049
+
+	# Capital One UK
+    Banker::Stratagies::CapitalOneUK.new(user_params).balance #=> 42000
 
 ## Alternate Languages
 
