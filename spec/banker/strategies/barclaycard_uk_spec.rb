@@ -22,7 +22,7 @@ describe Banker::Strategies::BarclaycardUK do
   describe '.new' do
 
     it{ subject.username.should eql 'Bloggs' }
-    it{ subject.passcode.should eql '123456' }
+    it{ subject.password.should eql '123456' }
     it{ subject.memorable_word.should eql 'superduper' }
     it{ subject.balance.should eql -82044 }
 

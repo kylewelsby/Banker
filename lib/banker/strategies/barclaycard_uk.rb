@@ -13,20 +13,20 @@ module Banker
     # Get OFX from Barcalycard UK
     #
     #     bank = Banker::Strategies::BarcalycardUK.new(:username => "joe"
-    #     :passcode => '123456',
+    #     :password => '123456',
     #     :memorable_word => 'superduper')
     #
     #     bank.balance #=> 410010
     #
     class BarclaycardUK
-      attr_accessor :username, :passcode, :memorable_word, :agent, :ofx, :balance
+      attr_accessor :username, :password, :memorable_word, :agent, :ofx, :balance
 
       LOGIN_ENDPOINT = 'https://bcol.barclaycard.co.uk/ecom/as2/initialLogon.do'
       EXPORT_ENDPOINT = 'https://bcol.barclaycard.co.uk/ecom/as2/export.do?doAction=processRecentExportTransaction&type=OFX_2_0_2&statementDate=&sortBy=transactionDate&sortType=Dsc'
 
       def initialize(args)
         @username = args[:username]
-        @passcode = args[:passcode]
+        @password = args[:password]
         @memorable_word = args[:memorable_word]
 
         @agent = Mechanize.new
@@ -44,7 +44,7 @@ module Banker
         form = page.form_with(:action => '/ecom/as2/initialLogon.do')
 
         form.username = @username
-        form.password = @passcode
+        form.password = @password
 
         page = @agent.submit(form, form.buttons.last)
 
