@@ -1,10 +1,12 @@
 # -*- encoding: utf-8 -*-
 require 'spec_helper'
 
-describe Banker::Stratagies::CapitalOneUK do
-  let(:login) { File.read(File.expand_path('../../../support/capital_one_uk/Login.do.html',__FILE__)) }
-  let(:transactions) { File.read(File.expand_path('../../../support/capital_one_uk/Transactions.do.html',__FILE__)) }
-  let(:data) { File.read(File.expand_path('../../../support/capital_one_uk/data.csv',__FILE__)) }
+describe Banker::Strategies::CapitalOneUK do
+  let(:support_files) {File.expand_path('../../../support/capital_one_uk/',__FILE__)}
+
+  let(:login) { File.read(File.expand_path('Login.do.html',support_files)) }
+  let(:transactions) { File.read(File.expand_path('Transactions.do.html',support_files)) }
+  let(:data) { File.read(File.expand_path('data.csv',support_files)) }
 
   before do
     stub_request(:get, "https://www.capitaloneonline.co.uk/CapitalOne_Consumer/Login.do").to_return(:status => 200, :body => login, :headers => {'Content-Type' => 'text/html'})
@@ -13,7 +15,7 @@ describe Banker::Stratagies::CapitalOneUK do
 
   end
 
-  subject { Banker::Stratagies::CapitalOneUK.new(:username => 'Joe',
+  subject { Banker::Strategies::CapitalOneUK.new(:username => 'Joe',
                                                  :password => 'password') }
 
   describe '.new' do
@@ -33,23 +35,9 @@ describe Banker::Stratagies::CapitalOneUK do
       WebMock.should have_requested(:post, 'https://www.capitaloneonline.co.uk/CapitalOne_Consumer/DownLoadTransaction.do')
     end
 
-    if RUBY_VERSION.to_f < 1.9
-      context "RubyVersion 1.8.7" do
-        it "should return transactions" do
-          subject.transactions.should be_a(FasterCSV::Table)
-          subject.transactions.first['Billing Amount'].should include "667.97"
-        end
-      end
+    it "should return transactions" do
+      subject.transactions.should be_a(CSV::Table)
+      subject.transactions.first['Billing Amount'].should include "667.97"
     end
-
-    if RUBY_VERSION.to_f > 1.8
-      context "RubyVersion 1.8.7" do
-        it "should return transactions" do
-          subject.transactions.should be_a(CSV::Table)
-          subject.transactions.first['Billing Amount'].should include "667.97"
-        end
-      end
-    end
-
   end
 end

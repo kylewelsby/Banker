@@ -6,28 +6,37 @@
 ## Supported Institutes
 
 * Barclay's Bank
+* Barclaycard UK
 * Capital One UK
 
 ## Getting Started
 
 Initiate a bank instance.
 
-    barclays = Banker::Stratagies::Barclays.new(surname: "Bloggs",
+    barclays = Banker::Strategies::Barclays.new(surname: "Bloggs",
                          			card_number: 4111111111111111,
                          			date_of_birth: Date.parse('2012-01-01'),
                          			memorable_word: "superduper"
     )
 
-    capital_one = Banker::Stratagies::CapitalOneUK.new(username: "Bloggs",
+    capital_one = Banker::Strategies::CapitalOneUK.new(username: "Bloggs",
                          			password: "password"
     )
 
+    barclaycard_uk = Banker::Strategies::BarclaycardUK.new(username: "Joe",
+                         			passcode: "123456",
+                              memorable_word: "superduper"
+    )
 
-Get the balance of the account.
 
-    barclays.balance #=>410000
 
-    capital_one.balance #=> 0
+Get the balance in pennies of the account.
+
+    barclays.balance #=> 410000
+
+    capital_one.balance #=> 410000
+
+    barclaycard_uk.balance #=> 410000
 
 ## Alternate Languages
 

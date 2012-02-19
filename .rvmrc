@@ -1,3 +1,2 @@
-rvm ree-1.8.7-2010.02@banker --create
 rvm 1.9.2@banker --create
 rvm 1.9.3@banker --create

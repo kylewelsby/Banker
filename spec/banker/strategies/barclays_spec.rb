@@ -1,12 +1,14 @@
 require 'spec_helper'
 
-describe Banker::Stratagies::Barclays do
-  let(:basic_access_start) { File.read(File.expand_path('../../../support/barclays/BasicAccessStart.do.html',__FILE__)) }
-  let(:basic_access_step1) { File.read(File.expand_path('../../../support/barclays/BasicAccessStep1.do.html',__FILE__)) }
-  let(:basic_access_step2) { File.read(File.expand_path('../../../support/barclays/BasicAccessStep2.do.html',__FILE__)) }
-  let(:redirect) { File.read(File.expand_path('../../../support/barclays/Redirect.do.html',__FILE__)) }
-  let(:export_data1) { File.read(File.expand_path('../../../support/barclays/ExportData1.do.html',__FILE__)) }
-  let(:data) { File.read(File.expand_path('../../../support/barclays/data.ofx',__FILE__)) }
+describe Banker::Strategies::Barclays do
+  let(:support_files) {File.expand_path('../../../support/barclays/',__FILE__)}
+
+  let(:basic_access_start) { File.read(File.expand_path('BasicAccessStart.do.html',support_files)) }
+  let(:basic_access_step1) { File.read(File.expand_path('BasicAccessStep1.do.html',support_files)) }
+  let(:basic_access_step2) { File.read(File.expand_path('BasicAccessStep2.do.html',support_files)) }
+  let(:redirect) { File.read(File.expand_path('Redirect.do.html',support_files)) }
+  let(:export_data1) { File.read(File.expand_path('ExportData1.do.html',support_files)) }
+  let(:data) { File.read(File.expand_path('data.ofx',support_files)) }
 
   before do
     stub_request(:get, "https://ibank.barclays.co.uk/olb/y/BasicAccessStart.do").to_return(:status => 200, :body => basic_access_start, :headers => {'Content-Type' => 'text/html'})
@@ -20,11 +22,11 @@ describe Banker::Stratagies::Barclays do
 
     stub_request(:post, 'https://ibank.barclays.co.uk/olb/y/ExportData1.do').to_return(:status => 200, :body => export_data1, :headers => {'Content-Type' => 'text/html'})
 
-    stub_request(:post, 'https://ibank.barclays.co.uk/olb/y/ExportData5.do').to_return(:status => 200, :body => data, :headers => {'Content-Type' => 'text/html'})
+    stub_request(:post, 'https://ibank.barclays.co.uk/olb/y/ExportData5.do').to_return(:status => 200, :body => data, :headers => {'Content-Type' => 'application/x-ofx'})
 
   end
 
-  subject {Banker::Stratagies::Barclays.new(:surname => 'Bloggs',
+  subject {Banker::Strategies::Barclays.new(:surname => 'Bloggs',
                                             :date_of_birth => Date.parse('2012-01-01'),
                                             :memorable_word => "superduper",
                                             :card_number => 4111111111111111)}

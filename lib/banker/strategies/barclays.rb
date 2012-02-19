@@ -3,7 +3,7 @@ require 'mechanize'
 require 'logger'
 
 module Banker
-  module Stratagies
+  module Strategies
 
     # This class allows the data retrieval of account data
     # for Barclay's Bank
@@ -12,14 +12,13 @@ module Banker
     #
     # Get OFX from Barclay's
     #
-    #     bank = Banker::Stratagies::Barclays.new(:surname => 'Bloggs',
+    #     bank = Banker::Strategies::Barclays.new(:surname => 'Bloggs',
     #     :date_of_birth => Date.parse('2012-01-01'),
     #     :memorable_word => 'superduper',
     #     :card_number => 4111111111111111)
     #
-    #     data = bank.get_data #=> OFX::Parser::OFX102
+    #     data.balance #=> 410010
     #
-    #     data.balance.amount #=> 4100.10
     class Barclays
       attr_accessor :surname, :date_of_birth, :memorable_word,
         :card_number, :agent, :ofx, :balance
@@ -60,6 +59,7 @@ module Banker
         file = @agent.submit(form, form.buttons.first)
 
         @ofx = OFX(file.body)
+
       end
 
 

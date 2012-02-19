@@ -6,7 +6,7 @@ require 'csv'
 require 'fastercsv'
 
 module Banker
-  module Stratagies
+  module Strategies
 
     # This class allows the data retrieval of account balaces
     # for Capital One UK
@@ -38,7 +38,7 @@ module Banker
         authenticate
       end
 
-private
+      private
 
       def authenticate
         page = @agent.get(LOGIN_ENDPOINT)
@@ -61,11 +61,7 @@ private
 
         csv = csv_data.body.gsub(/,\s*/, ',')
 
-        if RUBY_VERSION.to_f > 1.8
-          @transactions = CSV.parse(csv, :headers => true)
-        else
-          @transactions = FasterCSV.parse(csv, :headers => true)
-        end
+        @transactions = CSV.parse(csv, :headers => true)
       end
 
     end
