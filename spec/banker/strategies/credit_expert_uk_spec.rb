@@ -1,10 +1,20 @@
 require 'spec_helper'
 
-describe Banker::Strategies::CreditExpert do
-  let(:support_files) {File.expand_path('../../../support/credit_expert/',__FILE__)}
+describe Banker::Strategies::CreditExpertUK do
+  let(:support_files) {File.expand_path('../../../support/credit_expert_uk/',__FILE__)}
 
-  let(:mcclogin) {File.read(File.expand_path('MCCLogin.aspx.html', support_files))}
-  let(:mcclogin_memorable_word) {File.read(File.expand_path('MCCLoginMemorableWord.aspx.html', support_files))}
+  let(:mcclogin) {
+    File.read(
+      File.expand_path('MCCLogin.aspx.html', support_files)
+    )
+  }
+
+  let(:mcclogin_memorable_word) {
+    File.read(
+      File.expand_path('MCCLoginMemorableWord.aspx.html', support_files)
+    )
+  }
+
   let(:mcc) {
     File.read(
       File.expand_path('MCC.aspx.html', support_files)
@@ -12,7 +22,7 @@ describe Banker::Strategies::CreditExpert do
   }
 
 
-  subject {Banker::Strategies::CreditExpert.new(:username => "Bloggs",
+  subject {Banker::Strategies::CreditExpertUK.new(:username => "Bloggs",
                                                :password => "123456",
                                                :memorable_word => "superduper")}
 
