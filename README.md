@@ -10,6 +10,9 @@
 * Capital One UK
 * Lloyds TSB UK
 
+Extras
+* Credit Expert UK
+
 ## Example Usage
 
 
@@ -31,11 +34,17 @@ Get the balance in pennies of the account.
     # Barclaycard UK
     Banker::Strategies::BarclaycardUK.new(user_params).balance #=> 12300
 
-	# Lloyds TSB UK
+    # Lloyds TSB UK
     Banker::Stratagies::LloydsTSBUK.new(user_params).balance #=> 22049
 
-	# Capital One UK
+    # Capital One UK
     Banker::Stratagies::CapitalOneUK.new(user_params).balance #=> 42000
+
+Extra strategies
+
+    # Credit Expert UK
+    Banker::Stratagies::CreditExpertUK.new(user_params).score #=> 800
+
 
 ## Alternate Languages
 
