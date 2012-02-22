@@ -1,24 +1,20 @@
 module Banker
   module Stratagies
 
-    # This class allows the data retrieval of account balaces
-    # for Lloyds TSB UK 
+    # This class allows the data retrieval of accounts for Lloyds TSB UK
     #
     # == Examples
     #
-    # Make a new connection
+    # Retrieve Account Balance
     #
-    #     bank = Banker::Stratagies::LloydsTSBUK.new(:username => "Joe", :password => "password")
+    #     user_params = { username: 'Joe', password: 'password', memorable_word: 'superduper' }
+    #     lloyds = Banker::Stratagies::LloydsTSBUK.new(user_params)
+    #     lloyds.balance #=> { current: 4100.10, credit_card: 0 }
     #
-    #     data = bank.get_data
-    #
-    #     data.balance.amount #=> 4100.10
     class LloydsTSBUK
-      # Think about account - for the accounts overview page
       attr_accessor :username, :password, :memorable_word, :agent, :csv, :balance, :limit, :transactions
 
       LOGIN_ENDPOINT = "https://online.lloydstsb.co.uk/personal/logon/login.jsp"
-      MEMORABLE_ENDPOINT = "https://secure2.lloydstsb.co.uk/personal/a/logon/entermemorableinformation.jsp"
 
       def initialize(args)
         @username = args[:username]
@@ -36,34 +32,57 @@ module Banker
     private
 
       def authenticate
-        # Go to Login Page
-        login_page = @agent.get(LOGIN_ENDPOINT)
+        page = @agent.get(LOGIN_ENDPOINT)
 
-        # Submit the login form
-        login_page.form('frmLogin') do |f|
+        # Login Details
+        page = page.form('frmLogin') do |f|
           f.fields[0].value = @username
           f.fields[1].value = @password
         end.click_button
 
-        # Go to Memorable Word Page
-        memorable_page = @agent.get(MEMORABLE_ENDPOINT)
+        # Memorable Word
+        form = page.form('frmentermemorableinformation1')
 
-        # Get form
-        memorable_form = memorable_page.form('frmentermemorableinformation1')
+        first_letter = memorable_required(page)[0]
+        second_letter = memorable_required(page)[1]
+        third_letter = memorable_required(page)[2]
 
-        # Find Required Letters
-        letters = memorable_page.labels.
-                    collect { |char| char.to_s.gsub(/[^\d+]/, '') }
+        form.fields[2].value = '&nbsp;' + get_memorable_word_letter(first_letter)
+        form.fields[3].value = '&nbsp;' + get_memorable_word_letter(second_letter)
+        form.fields[4].value = '&nbsp;' + get_memorable_word_letter(third_letter)
 
-        # Find Required Letter Select Inputs
-        selects = memorable_form.fields.
-                    collect { |field| field if field.name.include?("EnterMemorableInformation") }.compact
+        page = @agent.submit(form, form.buttons.first)
 
-        # Set Memorable Word Select Inputs
-        [0, 1, 2].each { |n| selects[n].value = letters[n] }
+        # Accounts Page
+        accounts_count = page.search("ul.myAccounts ul.miniStatement").size
+        
+        account_names = page.search('div.accountDetails h2').collect {|account| account.content }
+        account_details = page.search('div.accountDetails p.numbers').collect {|num| num.content }
+        account_balance = page.search('div.balanceActionsWrapper p.balance').collect {|bal| bal.content }
+        # account_limit = page.search('div.balanceActionsWrapper p.accountMsg').collect {|bal| bal.content }
 
-        # Submit Memorable Word Form
-        memorable_form.click_button
+        formatted_account_details = account_details.map do |detail|
+          { details: detail.split(',').map { |d| d.gsub!(/[^\d+]/, '') } }
+        end
+
+        formatted_account_balance = account_balance.map do |bel|
+          { balance: bel.gsub!(/[^\d+]/, '') }
+        end
+
+        # formatted_account_limit = account_limit.map do |l|
+          # { limit: l.gsub!(/[^\d+]/, '') }
+        # end
+
+        account_names.zip(formatted_account_balance, formatted_account_details).inspect
+
+      end
+
+      def memorable_required(page)
+        page.labels.collect { |char| char.to_s.gsub(/[^\d+]/, '') }
+      end
+
+      def get_memorable_word_letter(letter)
+        @memorable_word.to_s[letter.to_i - 1]
       end
 
     end
