@@ -34,4 +34,19 @@ describe Banker::Stratagies::LloydsTSBUK do
     end
   end
 
+  describe '.get_memorable_word_letter' do
+    it { should respond_to(:get_memorable_word_letter) }
+    it 'should return requested letter' do
+      @memorable_word = 'Test'
+      subject.get_memorable_word_letter('4').should eql 'e'
+    end
+  end
+
+  describe '.cleaner' do
+    it { should respond_to(:cleaner) }
+    it 'should remove unwanted characters' do
+      subject.cleaner("Test123Test").should eql '123'
+    end
+  end
+
 end
