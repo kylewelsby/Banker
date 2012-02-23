@@ -25,17 +25,31 @@
 
 Get the balance in pennies of the account.
 
-    # Barclays Bank
-	Banker::Stratagies::Barclays.new(user_params).balance #=> 410000
+  # Barclays Bank
+	  Banker::Stratagies::Barclays.new(user_params).balance #=> 410000
 
-    # Barclaycard UK
+  # Barclaycard UK
     Banker::Strategies::BarclaycardUK.new(user_params).balance #=> 12300
 
 	# Lloyds TSB UK
-    Banker::Stratagies::LloydsTSBUK.new(user_params).balance #=> 22049
+    Banker::Stratagies::LloydsTSBUK.new(user_params).balance
+
+    #=>
+
+    [ {:current_account => { :balance => 160940,
+                             :details => { :sort_code => "928277",
+                                           :account_number => "92837592" }}},
+
+      {:savings_account => { :balance => 0.0,
+                             :details => { :sort_code => "918260",
+                                           :account_number=>"91850261" }}},
+
+      {:lloyds_tsb_platinum_mastercard => { :balance => 0.0,
+                                            :details => { :card_number => "9284710274618391" }}}
+    ]
 
 	# Capital One UK
-    Banker::Stratagies::CapitalOneUK.new(user_params).balance #=> 42000
+    Banker::Stratagies::CapitalOneUK.new(user_params).balance #=> 82730    
 
 ## Alternate Languages
 
