@@ -43,46 +43,54 @@ module Banker
         # Memorable Word
         form = page.form('frmentermemorableinformation1')
 
-        first_letter = memorable_required(page)[0]
-        second_letter = memorable_required(page)[1]
-        third_letter = memorable_required(page)[2]
-
-        form.fields[2].value = '&nbsp;' + get_memorable_word_letter(first_letter)
-        form.fields[3].value = '&nbsp;' + get_memorable_word_letter(second_letter)
-        form.fields[4].value = '&nbsp;' + get_memorable_word_letter(third_letter)
+        memorable_set(page, form)
 
         page = @agent.submit(form, form.buttons.first)
 
         # Accounts Page
-        accounts_count = page.search("ul.myAccounts ul.miniStatement").size
-        
-        account_names = page.search('div.accountDetails h2').collect {|account| account.content }
-        account_details = page.search('div.accountDetails p.numbers').collect {|num| num.content }
-        account_balance = page.search('div.balanceActionsWrapper p.balance').collect {|bal| bal.content }
-        # account_limit = page.search('div.balanceActionsWrapper p.accountMsg').collect {|bal| bal.content }
+        an = page.search('div.accountDetails h2').collect {|a| a.content }
+        ad = page.search('div.accountDetails p.numbers').collect {|n| n.content }
+        ab = page.search('div.balanceActionsWrapper p.balance').collect {|b| b.content }
 
-        formatted_account_details = account_details.map do |detail|
-          { details: detail.split(',').map { |d| d.gsub!(/[^\d+]/, '') } }
+        fd = ad.map { |detail| detail.split(',').map { |d| cleaner(d) } }
+
+        fb = ab.map { |b| cleaner(b) }
+
+        response = []
+        an.zip(fb, fd).each_with_index do |acc, index|
+          response << { "#{acc[0]}" => { balance: acc[1], details: acc[2] } }
         end
 
-        formatted_account_balance = account_balance.map do |bel|
-          { balance: bel.gsub!(/[^\d+]/, '') }
-        end
-
-        # formatted_account_limit = account_limit.map do |l|
-          # { limit: l.gsub!(/[^\d+]/, '') }
-        # end
-
-        account_names.zip(formatted_account_balance, formatted_account_details).inspect
+        puts response.inspect
 
       end
 
+      def memorable_letters(page)
+        {
+          first: memorable_required(page)[0],
+          second: memorable_required(page)[1],
+          third: memorable_required(page)[2]
+        }
+      end
+
+      def memorable_set(page, form)
+        letters = memorable_letters(page)
+
+        form.fields[2].value = '&nbsp;' + get_memorable_word_letter(letters.fetch(:first))
+        form.fields[3].value = '&nbsp;' + get_memorable_word_letter(letters.fetch(:second))
+        form.fields[4].value = '&nbsp;' + get_memorable_word_letter(letters.fetch(:third))
+      end
+
       def memorable_required(page)
-        page.labels.collect { |char| char.to_s.gsub(/[^\d+]/, '') }
+        page.labels.collect { |char| cleaner(char.to_s) }
       end
 
       def get_memorable_word_letter(letter)
         @memorable_word.to_s[letter.to_i - 1]
+      end
+
+      def cleaner(str)
+        str.gsub(/[^\d+]/, '')
       end
 
     end
