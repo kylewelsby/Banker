@@ -3,6 +3,7 @@
 Gemfile.lock
 pkg/*
 kyle.rb
+chuck.rb
 coverage
 *.un~
 *.log

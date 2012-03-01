@@ -1,24 +1,31 @@
 module Banker
   module Stratagies
 
-    # This class allows the data retrieval of account balaces
-    # for Lloyds TSB UK 
+    # This class allows the data retrieval of accounts for Lloyds TSB UK
     #
     # == Examples
     #
-    # Make a new connection
+    # Retrieve Account Balance
     #
-    #     bank = Banker::Stratagies::LloydsTSBUK.new(:username => "Joe", :password => "password")
+    #     user_params = { username: 'Joe', password: 'password', memorable_word: 'superduper' }
+    #     lloyds = Banker::Stratagies::LloydsTSBUK.new(user_params)
+    #     lloyds.balance
+    #     # => [ {:current_account => { :balance => 160940,
+    #                                   :details => { :sort_code => "928277",
+    #                                                 :account_number => "92837592" }}},
     #
-    #     data = bank.get_data
+    #            {:savings_account => { :balance => 0.0,
+    #                                   :details => { :sort_code => "918260",
+    #                                                 :account_number=>"91850261" }}},
     #
-    #     data.balance.amount #=> 4100.10
+    #            {:lloyds_tsb_platinum_mastercard => { :balance => 0.0,
+    #                                                  :details => { :card_number => "9284710274618391" }}}
+    #          ]
+    #
     class LloydsTSBUK
-      # Think about account - for the accounts overview page
-      attr_accessor :username, :password, :memorable_word, :agent, :csv, :balance, :limit, :transactions
+      attr_accessor :username, :password, :memorable_word, :balance, :agent
 
       LOGIN_ENDPOINT = "https://online.lloydstsb.co.uk/personal/logon/login.jsp"
-      MEMORABLE_ENDPOINT = "https://secure2.lloydstsb.co.uk/personal/a/logon/entermemorableinformation.jsp"
 
       def initialize(args)
         @username = args[:username]
@@ -30,40 +37,95 @@ module Banker
         @agent.user_agent = 'Mozilla/5.0 (Banker)'
         @agent.force_default_encoding = 'utf8'
 
-        authenticate
+        @balance = authenticate
+      end
+
+      def get_memorable_word_letter(letter)
+        @memorable_word.to_s[letter.to_i - 1]
+      end
+
+      def cleaner(str)
+        str.gsub(/[^\d+]/, '')
       end
 
     private
 
       def authenticate
-        # Go to Login Page
-        login_page = @agent.get(LOGIN_ENDPOINT)
+        page = @agent.get(LOGIN_ENDPOINT)
 
-        # Submit the login form
-        login_page.form('frmLogin') do |f|
+        # Login Page
+        page = page.form('frmLogin') do |f|
           f.fields[0].value = @username
           f.fields[1].value = @password
         end.click_button
 
-        # Go to Memorable Word Page
-        memorable_page = @agent.get(MEMORABLE_ENDPOINT)
+        # Memorable Word
+        form = page.form('frmentermemorableinformation1')
+        memorable_set(page, form)
+        page = @agent.submit(form, form.buttons.first)
 
-        # Get form
-        memorable_form = memorable_page.form('frmentermemorableinformation1')
+        # Accounts Page
+        return account_return(page)
+      end
 
-        # Find Required Letters
-        letters = memorable_page.labels.
-                    collect { |char| char.to_s.gsub(/[^\d+]/, '') }
+      def memorable_letters(page)
+        {
+          first: memorable_required(page)[0],
+          second: memorable_required(page)[1],
+          third: memorable_required(page)[2]
+        }
+      end
 
-        # Find Required Letter Select Inputs
-        selects = memorable_form.fields.
-                    collect { |field| field if field.name.include?("EnterMemorableInformation") }.compact
+      def memorable_set(page, form)
+        letters = memorable_letters(page)
 
-        # Set Memorable Word Select Inputs
-        [0, 1, 2].each { |n| selects[n].value = letters[n] }
+        form.fields[2].value = '&nbsp;' + get_memorable_word_letter(letters.fetch(:first))
+        form.fields[3].value = '&nbsp;' + get_memorable_word_letter(letters.fetch(:second))
+        form.fields[4].value = '&nbsp;' + get_memorable_word_letter(letters.fetch(:third))
+      end
 
-        # Submit Memorable Word Form
-        memorable_form.click_button
+      def memorable_required(page)
+        page.labels.collect { |char| cleaner(char.to_s) }
+      end
+
+      def account_name(page)
+        page.search('div.accountDetails h2').collect {|a| a.content.downcase.gsub(/\s/, '_').to_sym }
+      end
+
+      def account_detail(page)
+        page.search('div.accountDetails p.numbers').collect {|n| n.content }
+      end
+
+      def account_balance(page)
+        page.search('div.balanceActionsWrapper p.balance').collect {|b| b.content }
+      end
+
+      def formatted_detail(page)
+        resp = account_detail(page).map { |detail| detail.split(',').map { |d| cleaner(d) } }
+        resp.map! do |r|
+          if r.length == 2
+            { sort_code: r[0], account_number: r[1] }
+          elsif r.length == 1
+            { card_number: r[0] }
+          else
+            STDERR.puts "[Error] It seems we got account details that we did not expect! - #{r.inspect}"
+          end
+        end
+      end
+
+      def formatted_balance(page)
+        account_balance(page).map do |b|
+          resp = cleaner(b)
+          resp.empty? ? 0.00 : resp.to_i
+        end
+      end
+
+      def account_return(page)
+        resp = []
+        account_name(page).zip(formatted_balance(page), formatted_detail(page)).each_with_index do |acc, index|
+          resp << { acc[0] => { balance: acc[1], details: acc[2] } }
+        end
+        resp
       end
 
     end
