@@ -2,11 +2,12 @@
 require 'spec_helper'
 require 'mechanize'
 
-describe Banker::Stratagies::LloydsTSBUK do
-  let(:login) { File.read(File.expand_path('../../../support/lloyds_tsb_uk/login.jsp.html',__FILE__)) }
-  let(:memorable) { File.read(File.expand_path('../../../support/lloyds_tsb_uk/entermemorableinformation.jsp.html',__FILE__)) }
-  # let(:welcome) { File.read(File.expand_path('../../../support/lloyds_tsb_uk/interstitialpage.jsp.html',__FILE__)) }
-  let(:accounts) { File.read(File.expand_path('../../../support/lloyds_tsb_uk/account_overview_personal.html',__FILE__)) }
+describe Banker::LloydsTSBUK do
+  let(:support_files) {File.expand_path('../../support/lloyds_tsb_uk/',__FILE__)}
+  let(:login) { File.read(File.expand_path('login.jsp.html', support_files)) }
+  let(:memorable) { File.read(File.expand_path('entermemorableinformation.jsp.html', support_files)) }
+  let(:accounts) { File.read(File.expand_path('account_overview_personal.html', support_files)) }
+  # let(:welcome) { File.read(File.expand_path('interstitialpage.jsp.html', support_files)) }
 
   before do
     stub_request(:get, "https://online.lloydstsb.co.uk/personal/logon/login.jsp").
@@ -17,7 +18,7 @@ describe Banker::Stratagies::LloydsTSBUK do
       to_return(:status => 200, :body => accounts, :headers => { "Content-Type" => "text/html" })
   end
 
-  subject { Banker::Stratagies::LloydsTSBUK.new(:username => 'Joe', 
+  subject { Banker::LloydsTSBUK.new(:username => 'Joe',
                                                 :password => 'password',
                                                 :memorable_word => 'superduper') }
 

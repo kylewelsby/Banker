@@ -1,8 +1,8 @@
 # -*- encoding: utf-8 -*-
 require 'spec_helper'
 
-describe Banker::Strategies::CapitalOneUK do
-  let(:support_files) {File.expand_path('../../../support/capital_one_uk/',__FILE__)}
+describe Banker::CapitalOneUK do
+  let(:support_files) {File.expand_path('../../support/capital_one_uk/',__FILE__)}
 
   let(:login) { File.read(File.expand_path('Login.do.html',support_files)) }
   let(:transactions) { File.read(File.expand_path('Transactions.do.html',support_files)) }
@@ -15,7 +15,7 @@ describe Banker::Strategies::CapitalOneUK do
 
   end
 
-  subject { Banker::Strategies::CapitalOneUK.new(:username => 'Joe',
+  subject { Banker::CapitalOneUK.new(:username => 'Joe',
                                                  :password => 'password') }
 
   describe '.new' do

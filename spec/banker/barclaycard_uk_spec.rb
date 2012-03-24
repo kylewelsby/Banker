@@ -1,14 +1,14 @@
 require 'spec_helper'
 
-describe Banker::Strategies::BarclaycardUK do
-  let(:support_files) {File.expand_path('../../../support/barclaycard_uk/',__FILE__)}
+describe Banker::BarclaycardUK do
+  let(:support_files) {File.expand_path('../../support/barclaycard_uk/',__FILE__)}
 
   let(:initialLogon) {File.read(File.expand_path('initialLogon.do.html',support_files))}
   let(:validateMemorableWord) {File.read(File.expand_path('validateMemorableWord.do.html',support_files))}
   let(:cardSummary) {File.read(File.expand_path('cardSummary.do.html',support_files))}
   let(:data) {File.read(File.expand_path('data.ofx',support_files))}
 
-  subject { Banker::Strategies::BarclaycardUK.new(:username => 'Bloggs',
+  subject { Banker::BarclaycardUK.new(:username => 'Bloggs',
                                                  :password => '123456',
                                                  :memorable_word => 'superduper')}
 

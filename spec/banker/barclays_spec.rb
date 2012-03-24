@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe Banker::Strategies::Barclays do
-  let(:support_files) {File.expand_path('../../../support/barclays/',__FILE__)}
+describe Banker::Barclays do
+  let(:support_files) {File.expand_path('../../support/barclays/',__FILE__)}
 
   let(:basic_access_start) { File.read(File.expand_path('BasicAccessStart.do.html',support_files)) }
   let(:basic_access_step1) { File.read(File.expand_path('BasicAccessStep1.do.html',support_files)) }
@@ -25,7 +25,7 @@ describe Banker::Strategies::Barclays do
       to_return(:status => 200, :body => data, :headers => {'Content-Type' => 'text/html'})
   end
 
-  subject {Banker::Strategies::Barclays.new(:surname => 'Bloggs',
+  subject {Banker::Barclays.new(:surname => 'Bloggs',
                                             :date_of_birth => Date.parse('2012-01-01'),
                                             :memorable_word => "superduper",
                                             :card_number => 4111111111111111)}

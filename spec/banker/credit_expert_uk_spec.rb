@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe Banker::Strategies::CreditExpertUK do
-  let(:support_files) {File.expand_path('../../../support/credit_expert_uk/',__FILE__)}
+describe Banker::CreditExpertUK do
+  let(:support_files) {File.expand_path('../../support/credit_expert_uk/',__FILE__)}
 
   let(:mcclogin) {
     File.read(
@@ -22,7 +22,7 @@ describe Banker::Strategies::CreditExpertUK do
   }
 
 
-  subject {Banker::Strategies::CreditExpertUK.new(:username => "Bloggs",
+  subject {Banker::CreditExpertUK.new(:username => "Bloggs",
                                                :password => "123456",
                                                :memorable_word => "superduper")}
 
