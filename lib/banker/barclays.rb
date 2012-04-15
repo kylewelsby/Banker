@@ -2,13 +2,18 @@ module Banker
   class Barclays < Base
 
     LOGIN_URL = "https://bank.barclays.co.uk/olb/auth/LoginLink.action"
+    EXPORT_URL = "https://bank.barclays.co.uk/olb/balances/ExportDataStep1.action"
 
-    attr_accessor :accounts
+    attr_accessor :accounts, :ofx
 
     FIELD = {
       surname: "surname",
       membership_number: "membershipNumber",
-      passcode: 'passcode'
+      passcode: 'passcode',
+      memorable_word: [
+        'firstMemorableCharacter',
+        'secondMemorableCharacter'
+      ]
     }
 
     def initialize(args={})
@@ -20,54 +25,64 @@ module Banker
       @passcode = args.delete(:passcode)
       @memorable_word = args.delete(:memorable_word)
 
+      @accounts = []
+
       authenticate!
-    end
-
-    class Account < Barclays
-      attr_accessor :name, :amount
-
-      def initialize(account_id, agent)
-
-      end
+      delivery(download!)
     end
 
   private
 
     def authenticate!
-      stage_three(stage_two(stage_one))
-    end
-
-    def stage_one
       page = get(LOGIN_URL)
       form = page.form_with(action: 'LoginLink.action')
 
       form[FIELD[:surname]] = @surname
       form[FIELD[:membership_number]] = @membership_number
 
-      @agent.submit(form, form.buttons.first)
-    end
+      page = @agent.submit(form, form.buttons.first)
 
-    def stage_two(page)
       form = page.form_with(action: 'LoginStep1i.action')
-      form.checkbox_with('passcode').check
-      @agent.submit(form, form.buttons.first)
-    end
+      form.radiobuttons.first.check
+      page = @agent.submit(form, form.buttons.first)
 
-    def stage_three(page)
       form = page.form_with(action: 'LoginStep2.action')
-      memorable = memorable_required(page)
-      puts "#{'*'*10} [stage_three(page)] #{memorable.inspect}"
+      letters = memorable_required(page).delete_if { |v| v if v == 0 }
 
       form[FIELD[:passcode]] = @passcode
+      form[FIELD[:memorable_word][0]] = get_letter(@memorable_word, letters[0])
+      form[FIELD[:memorable_word][1]] = get_letter(@memorable_word, letters[1])
+
+      @agent.submit(form, form.buttons.first)
     end
 
     def memorable_required(page)
-      puts "#{'*'*10} [memorable_required(page)] #{page.inspect}"
-      page.labels.collect { |char| cleaner(char.to_s) }
+      page.labels.collect { |char| cleaner(char.to_s).to_i }
     end
 
     def cleaner(str)
       str.gsub(/[^\d+]/, '')
+    end
+
+    def download!
+      page = get(EXPORT_URL)
+      form = page.form_with(action: "/olb/balances/ExportDataStep1.action")
+      form['reqSoftwarePkgCode'] = '6'
+      form['productIdentifier'] = 'All'
+      page = @agent.submit(form, form.buttons.first)
+      form = page.form_with(:action => "/olb/balances/ExportDataStep2All.action")
+      file = @agent.submit(form, form.buttons.last)
+      return OFX(file.body)
+    end
+
+    def delivery(ofx)
+      amount = ofx.account.balance.amount_in_pennies
+      uid = Digest::MD5.hexdigest("Barclays#{@membership_number}")
+
+      @accounts << Banker::Account.new(uid: uid,
+                                       name: "Barclays",
+                                       amount: amount
+                                      )
     end
 
   end
