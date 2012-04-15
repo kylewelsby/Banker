@@ -1,6 +1,4 @@
 module Banker
-  # Base
-  # Set of shared definitions.
   class Base
     attr_writer :keys
     def params(args)
