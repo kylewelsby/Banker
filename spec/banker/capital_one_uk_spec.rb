@@ -20,8 +20,6 @@ describe Banker::CapitalOneUK do
   context "Parameters" do
     before do
       subject.any_instance.unstub(:params)
-      subject.any_instance.stub(:authenticate!)
-      subject.any_instance.stub(:get_data)
     end
 
     it "raises InvalidParams when email is missing" do
@@ -45,11 +43,6 @@ describe Banker::CapitalOneUK do
   end
 
   context "calls" do
-    before do
-      subject.any_instance.stub(:params)
-      subject.any_instance.stub(:authenticate!)
-      subject.any_instance.stub(:get_data)
-    end
 
     it "calls authenticate!" do
       subject.any_instance.should_receive(:authenticate!)
@@ -63,15 +56,23 @@ describe Banker::CapitalOneUK do
   end
 
   context "private" do
+    before do
+      Mechanize.stub(:new).and_return(mechanize.as_null_object)
+      mechanize.stub(form_with: form.as_null_object)
+      mechanize.stub(:at).and_return(node.as_null_object)
+    end
+
     describe "#authenticate!" do
       before do
-        Mechanize.stub(:new).and_return(mechanize.as_null_object)
-        mechanize.stub(form_with: form.as_null_object)
-
-        mechanize.stub(:at).and_return(node.as_null_object)
         subject.any_instance.unstub(:authenticate!)
         subject.any_instance.stub(:get_letter)
-        subject.any_instance.stub(:get_data)
+      end
+
+      it "uses LOGIN_ENDPOINT" do
+        mechanize.should_receive(:get).
+          with("https://www.capitaloneonline.co.uk/CapitalOne_Consumer/Login.do").
+          and_return(mechanize)
+        subject.new
       end
 
       it "finds by form name" do
@@ -104,10 +105,6 @@ describe Banker::CapitalOneUK do
 
     describe "#get_data" do
       before do
-        Mechanize.stub(:new).and_return(mechanize.as_null_object)
-        mechanize.stub(form_with: form.as_null_object)
-        mechanize.stub(:at).and_return(node.as_null_object)
-        #node.stub(content: "£100")
         subject.any_instance.stub(:get_letter)
 
         subject.any_instance.unstub(:authenticate!)
