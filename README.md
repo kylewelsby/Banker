@@ -5,13 +5,14 @@
 
 ## Supported Institutes
 
-* Barclay's Bank
-* Barclaycard UK
-* Capital One UK
-* Lloyds TSB UK
+* Barclay's Bank => Barclays
+* Barclaycard UK => BarclaycardUK
+* Capital One UK => CapitalOneUK
+* Lloyds TSB UK => LloydsTSBUK
 
-Extras
-* Credit Expert UK
+####Extras
+
+* Credit Expert UK => CreidtExpertUK
 
 ## Example Usage
 
@@ -29,31 +30,20 @@ Extras
 Get the balance in pennies of the account.
 
     # Barclays Bank
-	Banker::Stratagies::Barclays.new(user_params).balance #=> 410000
-
-    # Barclaycard UK
-    Banker::Strategies::BarclaycardUK.new(user_params).balance #=> 12300
-
-    # Capital One UK
-    Banker::Stratagies::CapitalOneUK.new(user_params).balance #=> 42000
-
-	# Lloyds TSB UK
-    Banker::Stratagies::LloydsTSBUK.new(user_params).balance #=>
-
-      [ {:current_account => { :balance => 160940,
-                               :details => { :sort_code => "...",
-                                             :account_number => "..." }}},
-
-        {:lloyds_tsb_platinum_mastercard => { :balance => 0.0,
-                                              :details => { :card_number => "..." }}}
-      ]
+	Banker::Barclays.new(user_params).accounts.first
+	# => <Banker::Account @name="Barclays Bank", @uid="cdd5f8e1c6e441fd9aac2786ca38c835", @amount=130000, @limit=-150000, @currency="GBP">
 
 
 Extra strategies
 
     # Credit Expert UK
-    Banker::Stratagies::CreditExpertUK.new(user_params).score #=> 800
+    Banker::CreditExpertUK.new(user_params).score #=> 800
 
+
+## Dependancies
+
+* Mechanize
+* OFX
 
 ## Alternate Languages
 
