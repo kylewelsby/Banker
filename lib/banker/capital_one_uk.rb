@@ -61,14 +61,16 @@ module Banker
     def get_data
       limit = -@page.at("table[summary='account summary'] tr:nth-child(1) td.normalText:nth-child(2)").content.gsub(/\D/,'').to_i
       amount = -@page.at("table[summary='account summary'] tr:nth-child(2) td.normalText:nth-child(2)").content.gsub(/\D/,'').to_i
-      account_number = @page.at("table:first-child tr:nth-child(5) td b").content.to_i
+      account_number = @page.at("table:first-child tr:nth-child(5) td b").
+        content.to_i
 
       uid = Digest::MD5.hexdigest("CapitalOneUK#{account_number}")
 
       @accounts << Banker::Account.new(name: "Capital Account",
                                        amount: amount,
                                        limit: limit,
-                                       uid: uid
+                                       uid: uid,
+                                       currency: "GBP"
                                       )
 
       #form = page.form('DownLoadTransactionForm')

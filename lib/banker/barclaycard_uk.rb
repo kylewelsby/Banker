@@ -10,61 +10,87 @@ module Banker
   #     :password => '123456',
   #     :memorable_word => 'superduper')
   #
-  #     bank.balance #=> 410010
+  #     bank.accounts.first.balance #=> 410010
   #
-  class BarclaycardUK
-    attr_accessor :username, :password, :memorable_word, :agent, :ofx, :balance
+  class BarclaycardUK < Base
+    attr_accessor :username, :password, :memorable_word, :accounts, :page
 
     LOGIN_ENDPOINT = 'https://bcol.barclaycard.co.uk/ecom/as2/initialLogon.do'
     EXPORT_ENDPOINT = 'https://bcol.barclaycard.co.uk/ecom/as2/export.do?doAction=processRecentExportTransaction&type=OFX_2_0_2&statementDate=&sortBy=transactionDate&sortType=Dsc'
+    FIELDS = {
+      username: 'username',
+      password: 'password',
+      memorable_word: [
+        'firstAnswer',
+        'secondAnswer'
+      ]
+    }
 
-    def initialize(args)
+    def initialize(args = {})
+      @keys = [:username, :password, :memorable_word]
+      params(args)
       @username = args[:username]
       @password = args[:password]
       @memorable_word = args[:memorable_word]
 
-      @agent = Mechanize.new
-      @agent.log = Logger.new 'mech.log'
-      @agent.user_agent = 'Mozilla/5.0 (Banker)'
+      @accounts = []
 
-      authenticate
+      authenticate!
 
-      @balance = @ofx.account.balance.amount_in_pennies
+      get_data
     end
     private
 
-    def authenticate
-      page = @agent.get(LOGIN_ENDPOINT)
+    def authenticate!
+      page = get(LOGIN_ENDPOINT)
       form = page.form_with(:action => '/ecom/as2/initialLogon.do')
 
-      form.username = @username
-      form.password = @password
+      form[FIELDS[:username]] = @username
+      form[FIELDS[:password]] = @password
 
-      page = @agent.submit(form, form.buttons.last)
+      @page = @agent.submit(form, form.buttons.last)
+      step2(@page)
+    end
+
+    def step2(page)
 
       form = page.form_with(:action => '/ecom/as2/validateMemorableWord.do')
 
-      first_letter = page.at("label[for='lettera']").content.scan(/\d+/).first.to_i
-      second_letter = page.at("label[for='letterb']").content.scan(/\d+/).first.to_i
+      first_letter = page.at("label[for='lettera']").content.
+        scan(/\d+/).first.to_i
+      second_letter = page.at("label[for='letterb']").content.
+        scan(/\d+/).first.to_i
 
-      form.firstAnswer = get_letter(first_letter).upcase
-      form.secondAnswer = get_letter(second_letter).upcase
+      form[FIELDS[:memorable_word][0]] = get_letter(@memorable_word,
+                                                    first_letter).upcase
+      form[FIELDS[:memorable_word][1]] = get_letter(@memorable_word,
+                                                    second_letter).upcase
 
-      page = @agent.submit(form, form.buttons.first)
+      @page = @agent.submit(form, form.buttons.first)
+      @limit = -@page.at(".panelSummary .limit .figure").content.
+        gsub(/\D/,'').to_i
+    end
 
-      #puts page.at("div.errorSummary")
-
-      ofx = @agent.get EXPORT_ENDPOINT
-
-      # Hack to downgrade version of OFX
-
+    def get_data
+      ofx = get(EXPORT_ENDPOINT)
       ofx = ofx.body.gsub('VERSION="202"','VERSION="200"')
 
       @ofx = OFX(ofx)
-    end
-    def get_letter(letter)
-      @memorable_word.to_s[letter-1]
-    end
 
+      resource = StringIO.new(ofx)
+      html = Nokogiri::HTML.parse(
+        Iconv.conv("UTF-8", "LATIN1//IGNORE",resource.read)
+      )
+      account_id = html.search("ccacctfrom > acctid").inner_text
+      currency = html.search("ccstmtrs > curdef").inner_text
+
+      uid = Digest::MD5.hexdigest("Barclayard#{@username}#{account_id}")
+      @accounts << Banker::Account.new(uid: uid,
+                          name: "Barclaycard",
+                          amount: @ofx.account.balance.amount_in_pennies,
+                          currency: currency,
+                          limit: @limit
+                         )
+    end
   end
 end

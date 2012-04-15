@@ -1,6 +1,6 @@
 module Banker
   class Account
-    attr_accessor :name, :uid, :amount, :limit
+    attr_accessor :name, :uid, :amount, :limit, :currency
     def initialize(args = {})
       raise Banker::Error::InvalidParams, "missing attribute `name`" unless args.has_key?(:name)
       raise Banker::Error::InvalidParams, "missing attribute `uid`" unless args.has_key?(:uid)
@@ -11,6 +11,7 @@ module Banker
       @uid = args[:uid]
       @amount = args[:amount]
       @limit = args[:limit]
+      @currency = args[:currency]
     end
   end
 end
