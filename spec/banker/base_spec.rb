@@ -26,4 +26,10 @@ describe Banker::Base do
       subject.get("http://google.com")
     end
   end
+
+  describe "#get_letter" do
+    it "gets the index 1st character from a string" do
+      subject.get_letter("bank",1).should eql "b"
+    end
+  end
 end

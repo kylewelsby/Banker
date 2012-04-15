@@ -22,5 +22,9 @@ module Banker
       @agent.force_default_encoding = "utf8"
       @agent.get(url)
     end
+
+    def get_letter(value,index)
+      value.to_s[index-1]
+    end
   end
 end
