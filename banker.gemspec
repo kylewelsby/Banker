@@ -1,35 +1,25 @@
 # -*- encoding: utf-8 -*-
-$:.push File.expand_path('../lib', __FILE__)
-require 'banker/version'
+require File.expand_path('../lib/banker/version', __FILE__)
 
-Gem::Specification.new do |s|
-  s.name        = 'banker'
-  s.version     = Banker::VERSION
-  s.authors     = ['Kyle Welsby', 'Chuck Hardy']
-  s.email       = ['app@britishruby.com']
-  s.homepage    = 'https://github.com/BritRuby/Banker'
-  s.description = %q{A collection of stratagies to access online bank accounts to obtain balance and transaction details.}
-  s.summary     = s.description
+Gem::Specification.new do |gem|
+  gem.authors     = ['Kyle Welsby', 'Chuck Hardy']
+  gem.email       = ['app@britishruby.com']
+  gem.homepage    = 'https://github.com/BritRuby/Banker'
+  gem.description = %q{A collection of strategies to access online bank accounts to obtain balance and transaction details.}
+  gem.summary     = gem.description
 
-  s.add_runtime_dependency 'mechanize'
-  s.add_runtime_dependency 'ofx'
+  gem.add_runtime_dependency 'mechanize'
+  gem.add_runtime_dependency 'ofx'
 
-  s.add_development_dependency 'growl'
-  s.add_development_dependency 'guard'
-  s.add_development_dependency 'guard-bundler'
-  s.add_development_dependency 'guard-rspec'
-  s.add_development_dependency 'rake'
-  s.add_development_dependency 'rb-fsevent'
-  s.add_development_dependency 'rspec', '~> 2.8'
-  s.add_development_dependency 'webmock'
-  s.add_development_dependency 'simplecov'
-  s.add_development_dependency 'cane'
+  gem.add_development_dependency "gem-release"
+  gem.add_development_dependency 'rspec'
+  gem.add_development_dependency 'webmock'
+  gem.add_development_dependency 'simplecov'
 
-  s.rubyforge_project = 'banker'
-
-  s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
-  s.require_paths = ['lib']
-
+  gem.files         = `git ls-files`.split("\n")
+  gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
+  gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  gem.name          = "Banker"
+  gem.require_paths = ['lib']
+  gem.version       = Banker::VERSION
 end

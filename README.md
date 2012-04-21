@@ -3,6 +3,9 @@
 [travis]:http://travis-ci.org/BritRuby/Banker
 [gemnasium]:https://gemnasium.com/BritRuby/Banker
 
+A collection of strategies to access online bank accounts to obtain balance 
+and transaction details.
+
 ## Supported Institutes
 
 * Barclay's Bank => Barclays
@@ -13,6 +16,20 @@
 ####Extras
 
 * Credit Expert UK => CreidtExpertUK
+
+## Installation
+
+Add this line to your application's Gemfile:
+
+    gem 'squeegee'
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install squeegee
 
 ## Example Usage
 
@@ -30,8 +47,8 @@
 Get the balance in pennies of the account.
 
     # Barclays Bank
-	Banker::Barclays.new(user_params).accounts.first
-	# => <Banker::Account @name="Barclays Bank", @uid="cdd5f8e1c6e441fd9aac2786ca38c835", @amount=130000, @limit=-150000, @currency="GBP">
+    Banker::Barclays.new(user_params).accounts.first
+    # => <Banker::Account @name="Barclays Bank", @uid="cdd5f8e1c6e441fd9aac2786ca38c835", @amount=130000, @limit=-150000, @currency="GBP">
 
 
 Extra strategies
@@ -48,6 +65,14 @@ Extra strategies
 ## Alternate Languages
 
 * Python [Bank Scraper](https://github.com/MoneyToolkit/Bank-Scraper) from MoneyToolKit
+
+## Contributing
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Added some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request
 
 ## License
 
