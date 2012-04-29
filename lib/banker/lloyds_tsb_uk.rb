@@ -1,129 +1,100 @@
 module Banker
-  # This class allows the data retrieval of accounts for Lloyds TSB UK
-  #
-  # == Examples
-  #
-  # Retrieve Account Balance
-  #
-  #     user_params = { username: 'Joe', password: 'password', memorable_word: 'superduper' }
-  #     lloyds = Banker::LloydsTSBUK.new(user_params)
-  #     lloyds.balance
-  #     # => [ {:current_account => { :balance => 160940,
-  #                                   :details => { :sort_code => "928277",
-  #                                                 :account_number => "92837592" }}},
-  #
-  #            {:savings_account => { :balance => 0.0,
-  #                                   :details => { :sort_code => "918260",
-  #                                                 :account_number=>"91850261" }}},
-  #
-  #            {:lloyds_tsb_platinum_mastercard => { :balance => 0.0,
-  #                                                  :details => { :card_number => "9284710274618391" }}}
-  #          ]
-  #
-  class LloydsTSBUK
-    attr_accessor :username, :password, :memorable_word, :balance, :agent
+  class LloydsTSBUK < Base
 
-    LOGIN_ENDPOINT = "https://online.lloydstsb.co.uk/personal/logon/login.jsp"
+    LOGIN_URL = "https://online.lloydstsb.co.uk/personal/logon/login.jsp"
+    COLLECT_URL = "https://secure2.lloydstsb.co.uk/personal/a/account_overview_personal/"
 
-    def initialize(args)
-      @username = args[:username]
-      @password = args[:password]
-      @memorable_word = args[:memorable_word]
+    attr_accessor :accounts
 
-      @agent = Mechanize.new
-      @agent.log = Logger.new 'mech.log'
-      @agent.user_agent = 'Mozilla/5.0 (Banker)'
-      @agent.force_default_encoding = 'utf8'
+    FIELD = {
+      username: 'frmLogin:strCustomerLogin_userID',
+      password: 'frmLogin:strCustomerLogin_pwd',
+      memorable_word: [
+        'frmentermemorableinformation1:strEnterMemorableInformation_memInfo1',
+        'frmentermemorableinformation1:strEnterMemorableInformation_memInfo2',
+        'frmentermemorableinformation1:strEnterMemorableInformation_memInfo3'
+      ]
+    }
 
-      @balance = authenticate
-    end
+    def initialize(args={})
+      @keys = %w(username password memorable_word)
 
-    def get_memorable_word_letter(letter)
-      @memorable_word.to_s[letter.to_i - 1]
-    end
+      params(args)
+      @username = args.delete(:username)
+      @password = args.delete(:password)
+      @memorable_word = args.delete(:memorable_word)
 
-    def cleaner(str)
-      str.gsub(/[^\d+]/, '')
+      @accounts = []
+
+      authenticate!
+      delivery!
     end
 
   private
 
-    def authenticate
-      page = @agent.get(LOGIN_ENDPOINT)
+    def authenticate!
+      page = get(LOGIN_URL)
+      form = page.form_with(action: '/personal/primarylogin')
 
-      # Login Page
-      page = page.form('frmLogin') do |f|
-        f.fields[0].value = @username
-        f.fields[1].value = @password
-      end.click_button
+      form[FIELD[:username]] = @username
+      form[FIELD[:password]] = @password
 
-      # Memorable Word
-      form = page.form('frmentermemorableinformation1')
-      memorable_set(page, form)
       page = @agent.submit(form, form.buttons.first)
 
-      # Accounts Page
-      return account_return(page)
+      form = page.form_with(action: '/personal/a/logon/entermemorableinformation.jsp')
+      letters = memorable_required(page).delete_if { |v| v if v == 0 }
+
+      form[FIELD[:memorable_word][0]] = '&nbsp;' + get_letter(@memorable_word, letters[0])
+      form[FIELD[:memorable_word][1]] = '&nbsp;' + get_letter(@memorable_word, letters[1])
+      form[FIELD[:memorable_word][2]] = '&nbsp;' + get_letter(@memorable_word, letters[2])
+
+      @agent.submit(form, form.buttons.first)
     end
 
-    def memorable_letters(page)
-      {
-        first: memorable_required(page)[0],
-        second: memorable_required(page)[1],
-        third: memorable_required(page)[2]
-      }
-    end
-
-    def memorable_set(page, form)
-      letters = memorable_letters(page)
-
-      form.fields[2].value = '&nbsp;' + get_memorable_word_letter(letters.fetch(:first))
-      form.fields[3].value = '&nbsp;' + get_memorable_word_letter(letters.fetch(:second))
-      form.fields[4].value = '&nbsp;' + get_memorable_word_letter(letters.fetch(:third))
-    end
-
-    def memorable_required(page)
-      page.labels.collect { |char| cleaner(char.to_s) }
-    end
-
-    def account_name(page)
-      page.search('div.accountDetails h2').collect {|a| a.content.downcase.gsub(/\s/, '_').to_sym }
-    end
-
-    def account_detail(page)
-      page.search('div.accountDetails p.numbers').collect {|n| n.content }
-    end
-
-    def account_balance(page)
-      page.search('div.balanceActionsWrapper p.balance').collect {|b| b.content }
-    end
-
-    def formatted_detail(page)
-      resp = account_detail(page).map { |detail| detail.split(',').map { |d| cleaner(d) } }
-      resp.map! do |r|
-        if r.length == 2
-          { sort_code: r[0], account_number: r[1] }
-        elsif r.length == 1
-          { card_number: r[0] }
-        else
-          STDERR.puts "[Error] It seems we got account details that we did not expect! - #{r.inspect}"
-        end
+    def name(page)
+      page.search('div.accountDetails h2').collect do |a|
+        a.content.downcase.gsub(/\s/, '_').to_sym
       end
     end
 
-    def formatted_balance(page)
-      account_balance(page).map do |b|
+    def identifier(page)
+      page.search('div.accountDetails p.numbers').collect do |n|
+        n.content.split(',').map { |d| cleaner(d) }
+      end
+    end
+
+    def balance(page)
+      bal = page.search('div.balanceActionsWrapper p.balance').collect {|b| b.content }
+
+      bal.map do |b|
         resp = cleaner(b)
         resp.empty? ? 0.00 : resp.to_i
       end
     end
 
-    def account_return(page)
-      resp = []
-      account_name(page).zip(formatted_balance(page), formatted_detail(page)).each_with_index do |acc, index|
-        resp << { acc[0] => { balance: acc[1], details: acc[2] } }
+    def limit(page)
+      page.search('div.accountBalance').inject([]) do |acc, b|
+        if b.content.downcase.include?('limit')
+          acc << cleaner(b.content.scan(/[\d.]+$/).first)
+        else
+          acc << 0.00
+        end
+        acc
       end
-      resp
+    end
+
+    def delivery!
+      page = get(COLLECT_URL)
+      name(page).zip(balance(page), identifier(page), limit(page)).each_with_index do |acc, index|
+        next if acc[2].nil?
+        uid = Digest::MD5.hexdigest("LloydsTSBUK#{acc[2].last}")
+        @accounts << Banker::Account.new(uid: uid,
+                                         name: "#{acc[0]}",
+                                         limit: acc[3],
+                                         amount: acc[1],
+                                         currency: 'GBP'
+                                        )
+      end
     end
 
   end

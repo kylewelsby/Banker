@@ -24,5 +24,13 @@ module Banker
     def get_letter(value,index)
       value.to_s[index-1]
     end
+
+    def memorable_required(page)
+      page.labels.collect { |char| cleaner(char.to_s).to_i }
+    end
+
+    def cleaner(str)
+      str.gsub(/[^\d+]/, '')
+    end
   end
 end
