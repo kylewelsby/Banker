@@ -9,7 +9,7 @@ Gem::Specification.new do |gem|
   gem.summary     = gem.description
 
   gem.add_runtime_dependency 'mechanize'
-  gem.add_runtime_dependency 'ofx'
+  gem.add_runtime_dependency 'banker-ofx'
 
   gem.add_development_dependency "gem-release"
   gem.add_development_dependency 'rspec'

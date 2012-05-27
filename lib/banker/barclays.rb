@@ -76,13 +76,14 @@ module Banker
     end
 
     def delivery(ofx)
-      amount = ofx.account.balance.amount_in_pennies
-      uid = Digest::MD5.hexdigest("Barclays#{@membership_number}")
+      ofx.bank_accounts.each_with_object(@accounts) do |account, accounts|
+        args = { uid: Digest::MD5.hexdigest("Barclays#{@membership_number}#{account.id}"),
+                 name: "Barclays #{account.id[-4,4]}",
+                 amount: account.balance.amount_in_pennies,
+                 currency: account.currency }
 
-      @accounts << Banker::Account.new(uid: uid,
-                                       name: "Barclays",
-                                       amount: amount
-                                      )
+        accounts << Banker::Account.new(args)
+      end
     end
 
   end
