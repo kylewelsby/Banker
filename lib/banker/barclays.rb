@@ -78,7 +78,7 @@ module Banker
     def delivery(ofx)
       ofx.bank_accounts.each_with_object(@accounts) do |account, accounts|
         args = { uid: Digest::MD5.hexdigest("Barclays#{@membership_number}#{account.id}"),
-                 name: "Barclays #{account.id}",
+                 name: "Barclays #{account.id[-4,4]}",
                  amount: account.balance.amount_in_pennies,
                  currency: account.currency }
 

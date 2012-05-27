@@ -218,7 +218,7 @@ describe Banker::Barclays do
     end
 
     it { obj.uid.should == '077db20dce9425514828c5104b10df51' }
-    it { obj.name.should == 'Barclays 11111111111111' }
+    it { obj.name.should == 'Barclays 1111' }
     it { obj.amount.should == 410010 }
     it { obj.currency.should == 'GBP' }
   end
