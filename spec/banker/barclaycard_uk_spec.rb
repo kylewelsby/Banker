@@ -158,10 +158,6 @@ describe Banker::BarclaycardUK do
           and_return(stub(body: ofx))
         subject.new
       end
-      it "finds account balance" do
-
-      end
-      it "finds account limit"
     end
   end
 end

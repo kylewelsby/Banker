@@ -217,9 +217,10 @@ describe Banker::Barclays do
       subject.any_instance.stub(:download!).and_return(ofx)
     end
 
-    it { obj.uid.should == 'febcbc946e71cb09820c152c727b9b90' }
-    it { obj.name.should == 'Barclays' }
+    it { obj.uid.should == '077db20dce9425514828c5104b10df51' }
+    it { obj.name.should == 'Barclays 11111111111111' }
     it { obj.amount.should == 410010 }
+    it { obj.currency.should == 'GBP' }
   end
 
 end
