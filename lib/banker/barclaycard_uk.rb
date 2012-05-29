@@ -75,22 +75,15 @@ module Banker
       ofx = get(EXPORT_ENDPOINT)
       ofx = ofx.body.gsub('VERSION="202"','VERSION="200"')
 
-      @ofx = OFX(ofx)
+      OFX(ofx).credit_cards.each_with_object(@accounts) do |account, accounts|
+        args = { uid: Digest::MD5.hexdigest("Barclayard#{@username}#{account.id}"),
+                 name: "Barclaycard #{account.id[-4,4]}",
+                 amount: account.balance.amount_in_pennies,
+                 currency: account.currency,
+                 limit: @limit }
 
-      resource = StringIO.new(ofx)
-      html = Nokogiri::HTML.parse(
-        Iconv.conv("UTF-8", "LATIN1//IGNORE",resource.read)
-      )
-      account_id = html.search("ccacctfrom > acctid").inner_text
-      currency = html.search("ccstmtrs > curdef").inner_text
-
-      uid = Digest::MD5.hexdigest("Barclayard#{@username}#{account_id}")
-      @accounts << Banker::Account.new(uid: uid,
-                          name: "Barclaycard",
-                          amount: @ofx.account.balance.amount_in_pennies,
-                          currency: currency,
-                          limit: @limit
-                         )
+        accounts << Banker::Account.new(args)
+      end
     end
   end
 end
