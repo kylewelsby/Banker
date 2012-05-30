@@ -21,7 +21,7 @@ and transaction details.
 
 Add this line to your application's Gemfile:
 
-    gem 'squeegee'
+    gem 'banker'
 
 And then execute:
 
@@ -29,7 +29,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install squeegee
+    $ gem install banker
 
 ## Example Usage
 
