@@ -1,2 +1,2 @@
 rvm use ruby-1.9.2@banker --create
-rvm use ruby-1.9.3@banker --create
+rvm use ruby-1.9.3-p125@banker --create

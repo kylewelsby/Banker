@@ -44,7 +44,7 @@ module Banker
       form = page.form_with(name: 'logonForm')
 
       form[FIELD[:username]] = @username
-      letters_html = page.at("#sign_in_box .password").content
+      letters_html = page.at("#sign_in_box div:nth-child(3)").content
       letters = letters_html.scan(/(\d)/).collect { |letter| letter[0].to_i }
 
       form[FIELD[:password][0]] = get_letter(@password, letters[0])

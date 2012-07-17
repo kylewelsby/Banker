@@ -83,7 +83,7 @@ describe Banker::CapitalOneUK do
       end
 
       it "fills in form inputs" do
-        mechanize.should_receive(:at).with("#sign_in_box .password").
+        mechanize.should_receive(:at).with("#sign_in_box div:nth-child(3)").
           and_return(node)
         node.should_receive(:content).
           and_return("1st 2nd 3rd")
