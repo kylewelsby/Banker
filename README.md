@@ -1,7 +1,7 @@
-# Banker [![CI Build Status](https://secure.travis-ci.org/BritRuby/Banker.png?branch=master)][travis] [![Dependency Status](https://gemnasium.com/BritRuby/Banker.png?travis)][gemnasium]
+# Banker [![CI Build Status](https://secure.travis-ci.org/kylewelsby/Banker.png?branch=master)][travis] [![Dependency Status](https://gemnasium.com/kylewelsby/Banker.png?travis)][gemnasium]
 
-[travis]:http://travis-ci.org/BritRuby/Banker
-[gemnasium]:https://gemnasium.com/BritRuby/Banker
+[travis]:http://travis-ci.org/kylewelsby/Banker
+[gemnasium]:https://gemnasium.com/kylewelsby/Banker
 
 A collection of strategies to access online bank accounts to obtain balance 
 and transaction details.
