@@ -1,15 +1,14 @@
 module Banker
   class Account < Base
-    attr_accessor :name, :uid, :amount, :limit, :currency
+    attr_accessor :name, :uid, :amount, :limit, :currency, :transactions
     def initialize(args = {})
       @keys = %w(name uid amount)
       params(args)
+      @transactions = []
 
-      @name = args[:name]
-      @uid = args[:uid]
-      @amount = args[:amount]
-      @limit = args[:limit]
-      @currency = args[:currency]
+      args.each do |attribute, value|
+        send(:"#{attribute}=", value)
+      end
     end
   end
 end

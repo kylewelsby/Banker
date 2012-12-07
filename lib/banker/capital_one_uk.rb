@@ -1,3 +1,4 @@
+#coding: utf-8
 module Banker
   # This class allows the data retrieval of account balaces
   # for Capital One UK
@@ -54,10 +55,6 @@ module Banker
       @page = @agent.submit(form, form.buttons.first)
     end
 
-    #def letters
-      #html = page.search('#sign_in_box .password').content
-    #end
-
     def get_data
       limit = -@page.at("table[summary='account summary'] tr:nth-child(1) td.normalText:nth-child(2)").content.gsub(/\D/,'').to_i
       amount = -@page.at("table[summary='account summary'] tr:nth-child(2) td.normalText:nth-child(2)").content.gsub(/\D/,'').to_i
@@ -65,23 +62,30 @@ module Banker
         content.to_i
 
       uid = Digest::MD5.hexdigest("CapitalOneUK#{account_number}")
+      last_four = account_number.to_s[-4..-1]
+      _account = Banker::Account.new(
+        :name => "Capital Account (#{last_four})",
+          :amount => amount,
+          :limit => limit,
+          :uid => uid,
+          :currency => "GBP"
+      )
 
-      @accounts << Banker::Account.new(name: "Capital Account (#{account_number.to_s[-4..-1]})",
-                                       amount: amount,
-                                       limit: limit,
-                                       uid: uid,
-                                       currency: "GBP"
-                                      )
-
-      #form = page.form('DownLoadTransactionForm')
-
-      #form.downloadType = 'csv'
-
-      #csv_data = @agent.submit(form, form.buttons.first)
-
-      #csv = csv_data.body.gsub(/,\s*/, ',')
-
-      #@transactions = CSV.parse(csv, :headers => true)
+      form = page.form('DownLoadTransactionForm')
+      form.downloadType = 'csv'
+      csv_data = @agent.submit(form, form.buttons.first)
+      csv = csv_data.body.gsub(/,\s*/, ',')
+      _transactions = CSV.parse(csv, :headers => true)
+      _transactions.each do |transaction|
+        _transaction = Banker::Transaction.new(
+          :transacted_at => Time.parse(transaction[0]),
+          :amount => -transaction[2].gsub(/[^\d-]/,'').to_i,
+          :description => transaction[3],
+          :uid => transaction[7]
+        )
+        _account.transactions << _transaction
+      end
+      @accounts << _account
     end
 
   end

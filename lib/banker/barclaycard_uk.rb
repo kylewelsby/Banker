@@ -13,7 +13,7 @@ module Banker
   #     bank.accounts.first.balance #=> 410010
   #
   class BarclaycardUK < Base
-    attr_accessor :username, :password, :memorable_word, :accounts, :page
+    attr_accessor :username, :password, :memorable_word, :accounts, :page, :ofx
 
     LOGIN_ENDPOINT  = 'https://bcol.barclaycard.co.uk/ecom/as2/initialLogon.do'
     EXPORT_ENDPOINT = 'https://bcol.barclaycard.co.uk/ecom/as2/export.do?doAction=processRecentExportTransaction&type=OFX_2_0_2&statementDate=&sortBy=transactionDate&sortType=Dsc'
@@ -38,6 +38,7 @@ module Banker
       authenticate!
 
       get_data
+      parse_ofx('credit_card')
     end
     private
 
@@ -79,18 +80,9 @@ module Banker
     end
 
     def get_data
-      ofx = get(EXPORT_ENDPOINT)
-      ofx = ofx.body.gsub('VERSION="202"','VERSION="200"')
-
-      OFX(ofx).credit_cards.each_with_object(@accounts) do |account, accounts|
-        args = { uid: Digest::MD5.hexdigest("Barclayard#{@username}#{account.id}"),
-                 name: "Barclaycard #{account.id[-4,4]}",
-                 amount: account.balance.amount_in_pennies,
-                 currency: account.currency,
-                 limit: @limit }
-
-        accounts << Banker::Account.new(args)
-      end
+      file = get(EXPORT_ENDPOINT)
+      body = file.body.gsub('VERSION="202"','VERSION="200"')
+      self.ofx = OFX(body)
     end
   end
 end

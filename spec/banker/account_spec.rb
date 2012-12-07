@@ -13,20 +13,25 @@ describe Banker::Account do
   it {subject.new(attr).should respond_to(:uid)}
   it {subject.new(attr).should respond_to(:amount)}
   it {subject.new(attr).should respond_to(:limit)}
+  it { expect(subject.new(attr)).to respond_to(:transactions) }
 
   it "validates presence of name" do
     expect{
       subject.new
     }.to raise_error(Banker::Error::InvalidParams, %r{missing parameters `name` `uid` `amount`})
   end
+  
   it "validates presence of uid" do
     expect{
       subject.new(name:'')
     }.to raise_error(Banker::Error::InvalidParams, %r{missing parameters `uid` `amount`})
   end
+
   it "validates presence of amount" do
     expect{
       subject.new(name:'',uid:'')
     }.to raise_error(Banker::Error::InvalidParams, %r{missing parameters `amount`})
   end
+
+  it { expect(subject.new(attr).transactions).to be_a Array }
 end

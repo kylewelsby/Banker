@@ -21,6 +21,7 @@ describe Banker::BarclaycardUK do
     subject.any_instance.stub(:params)
     subject.any_instance.stub(:authenticate!)
     subject.any_instance.stub(:get_data)
+    subject.any_instance.stub(:parse_ofx)
   end
 
   it {subject.new.should respond_to(:accounts)}

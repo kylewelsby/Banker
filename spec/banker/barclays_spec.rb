@@ -27,6 +27,7 @@ describe Banker::Barclays do
       subject.any_instance.stub(:authenticate!)
       subject.any_instance.stub(:download!)
       subject.any_instance.stub(:delivery)
+      subject.any_instance.stub(:parse_ofx)
     end
 
     it { subject.new(args).should respond_to(:accounts) }
@@ -38,6 +39,7 @@ describe Banker::Barclays do
       subject.any_instance.stub(:authenticate!)
       subject.any_instance.stub(:download!)
       subject.any_instance.stub(:delivery)
+      subject.any_instance.stub(:parse_ofx)
     end
 
     context 'Valid Params' do
@@ -63,6 +65,7 @@ describe Banker::Barclays do
       subject.any_instance.stub(:authenticate!)
       subject.any_instance.stub(:download!)
       subject.any_instance.stub(:delivery)
+      subject.any_instance.stub(:parse_ofx)
     end
 
     it "should Call params Method" do
@@ -209,12 +212,13 @@ describe Banker::Barclays do
     end
   end
 
-  describe '#delivery()' do
+  describe '#get_data' do
     let(:obj) { subject.new(args).accounts.first }
 
     before do
       subject.any_instance.stub(:authenticate!)
       subject.any_instance.stub(:download!).and_return(ofx)
+      subject.any_instance.stub(:ofx).and_return(ofx)
     end
 
     it { obj.uid.should == '077db20dce9425514828c5104b10df51' }
