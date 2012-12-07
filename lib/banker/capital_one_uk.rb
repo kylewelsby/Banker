@@ -66,7 +66,7 @@ module Banker
 
       uid = Digest::MD5.hexdigest("CapitalOneUK#{account_number}")
 
-      @accounts << Banker::Account.new(name: "Capital Account",
+      @accounts << Banker::Account.new(name: "Capital Account (#{account_number.to_s[-4..-1]})",
                                        amount: amount,
                                        limit: limit,
                                        uid: uid,
