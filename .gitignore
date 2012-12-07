@@ -7,3 +7,5 @@ chuck.rb
 coverage
 *.un~
 *.log
+
+/tmp/

@@ -17,16 +17,16 @@ describe Banker::Account do
   it "validates presence of name" do
     expect{
       subject.new
-    }.to raise_error(ArgumentError, "missing attribute `name`")
+    }.to raise_error(Banker::Error::InvalidParams, %r{missing parameters `name` `uid` `amount`})
   end
   it "validates presence of uid" do
     expect{
       subject.new(name:'')
-    }.to raise_error(ArgumentError, "missing attribute `uid`")
+    }.to raise_error(Banker::Error::InvalidParams, %r{missing parameters `uid` `amount`})
   end
   it "validates presence of amount" do
     expect{
       subject.new(name:'',uid:'')
-    }.to raise_error(ArgumentError, "missing attribute `amount`")
+    }.to raise_error(Banker::Error::InvalidParams, %r{missing parameters `amount`})
   end
 end

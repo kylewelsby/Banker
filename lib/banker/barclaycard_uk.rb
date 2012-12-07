@@ -15,7 +15,7 @@ module Banker
   class BarclaycardUK < Base
     attr_accessor :username, :password, :memorable_word, :accounts, :page
 
-    LOGIN_ENDPOINT = 'https://bcol.barclaycard.co.uk/ecom/as2/initialLogon.do'
+    LOGIN_ENDPOINT  = 'https://bcol.barclaycard.co.uk/ecom/as2/initialLogon.do'
     EXPORT_ENDPOINT = 'https://bcol.barclaycard.co.uk/ecom/as2/export.do?doAction=processRecentExportTransaction&type=OFX_2_0_2&statementDate=&sortBy=transactionDate&sortType=Dsc'
     FIELDS = {
       username: 'username',
@@ -42,8 +42,15 @@ module Banker
     private
 
     def authenticate!
+      @agent = Mechanize.new
+      cookie = Mechanize::Cookie.new('LANDING_PAGE_COOKIE', '-D##')
+      u = URI.parse(LOGIN_ENDPOINT)
+      cookie.domain = ".barclaycard.co.uk"
+      cookie.path = "/"
+      @agent.cookie_jar.add(u, cookie)
       page = get(LOGIN_ENDPOINT)
       form = page.form_with(:action => '/ecom/as2/initialLogon.do')
+      raise FormMissing if form.nil?
 
       form[FIELDS[:username]] = @username
       form[FIELDS[:password]] = @password

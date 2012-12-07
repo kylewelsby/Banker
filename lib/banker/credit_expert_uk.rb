@@ -12,7 +12,7 @@ module Banker
   #
   #     site.score #=> 800
   #
-  class CreditExpertUK
+  class CreditExpertUK < Base
     attr_accessor :username, :password, :memorable_word, :agent, :score
 
     LOGIN_ENDPOINT = "https://www.creditexpert.co.uk/MCCLogin.aspx"
@@ -32,13 +32,11 @@ module Banker
     }
 
     def initialize(args)
+      @keys = %w(username password memorable_word)
+      params(args)
       @username = args[:username]
       @password = args[:password]
       @memorable_word = args[:memorable_word]
-
-      @agent = Mechanize.new
-      @agent.log = Logger.new 'mech.log'
-      @agent.user_agent = 'Mozilla/5.0 (Banker)'
 
       authenticate
     end
@@ -47,34 +45,10 @@ module Banker
 
     def authenticate
       @score = data
-=begin
-      page = @agent.get(LOGIN_ENDPOINT)
-
-      form = page.form_with(:action => 'MCCLogin.aspx')
-
-      form[FIELDS[:username]] = @username
-      form[FIELDS[:password]] = @password
-
-
-      page = @agent.submit(form, form.buttons.first)
-
-      form = page.form_with(:name => 'MasterPage')
-
-      first_letter = page.at(FIELDS[:questions][0]).content.scan(/\d+/).first.to_i
-      second_letter = page.at(FIELDS[:questions][1]).content.scan(/\d+/).first.to_i
-
-      form[FIELDS[:answers][0]] = get_letter(first_letter)
-
-      form[FIELDS[:answers][1]] = get_letter(second_letter)
-
-      page = @agent.submit(form, form.buttons.first)
-
-      @score = page.at(FIELDS[:score]).content.to_i
-=end
     end
 
     def start
-      page = @agent.get(LOGIN_ENDPOINT)
+      page = get(LOGIN_ENDPOINT)
 
       form = page.form_with(:action => 'MCCLogin.aspx')
 
@@ -87,6 +61,7 @@ module Banker
     def step1
       page = start
       form = page.form_with(name: 'MasterPage')
+      raise MissingForm if form.nil?
 
       first_letter = extract_digit(page.at(FIELDS[:questions][0]).content)
       second_letter = extract_digit(page.at(FIELDS[:questions][1]).content)
