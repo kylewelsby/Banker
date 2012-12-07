@@ -1,6 +1,6 @@
 module Banker
   class Base
-    attr_writer :keys
+    attr_writer :keys, :agent
     def params(args)
       missing_keys = []
       return unless defined? @keys
@@ -18,6 +18,7 @@ module Banker
       @agent.log = Logger.new 'banker.log'
       @agent.user_agent = "Mozilla/5.0 (Banker)"
       @agent.force_default_encoding = "utf8"
+      @agent.agent.http.ssl_version = :SSLv3
       @agent.get(url)
     end
 
