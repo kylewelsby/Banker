@@ -2,9 +2,9 @@
 require File.expand_path('../lib/banker/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.authors     = ['Kyle Welsby', 'Chuck Hardy']
-  gem.email       = ['app@britishruby.com']
-  gem.homepage    = 'https://github.com/BritRuby/Banker'
+  gem.authors     = ['Kyle Welsby']
+  gem.email       = ['kyle@mekyle.com']
+  gem.homepage    = 'https://github.com/kylewelsby/Banker'
   gem.description = %q{A collection of strategies to access online bank accounts to obtain balance and transaction details.}
   gem.summary     = gem.description
 

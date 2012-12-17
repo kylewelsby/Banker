@@ -46,7 +46,7 @@ module Banker
       end
       _accounts.each_with_object(@accounts) do |account, accounts|
         args = { uid: Digest::MD5.hexdigest("#{class_name}#{@membership_number}#{account.id}"),
-                 name: "#{class_name} #{account.id[-4,4]}",
+                 name: "#{class_name} #{account.id[-4..-1]}",
                  amount: account.balance.amount_in_pennies,
                  currency: account.currency }
         e_account = Banker::Account.new(args)
