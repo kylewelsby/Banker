@@ -1,7 +1,7 @@
 # Banker 
-[![Gem Version](https://badge.fury.io/rb/banker.png)][gem_version]
-[![CI Build Status](https://secure.travis-ci.org/kylewelsby/Banker.png?branch=master)][travis] [![Dependency Status](https://gemnasium.com/kylewelsby/Banker.png?travis)][gemnasium]
-[![Code Climate](https://codeclimate.com/github/kylewelsby/Banker.png)][code_climate]
+[![Gem Version](https://badge.fury.io/rb/banker.svg)][gem_version]
+[![CI Build Status](https://secure.travis-ci.org/kylewelsby/Banker.svg?branch=master)][travis] [![Dependency Status](https://gemnasium.com/kylewelsby/Banker.svg?travis)][gemnasium]
+[![Code Climate](https://codeclimate.com/github/kylewelsby/Banker.svg)][code_climate]
 
 [gem_version]:http://badge.fury.io/rb/banker
 [travis]:http://travis-ci.org/kylewelsby/Banker
